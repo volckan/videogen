@@ -140,7 +140,10 @@ body.preview .dock{display:none!important}
 .dk-h button:hover:not(:disabled){border-color:var(--accent);color:var(--ink)}
 .dk-h button.on{color:var(--accent);border-color:color-mix(in srgb,var(--accent) 45%,transparent)}
 .dk-h button:disabled{opacity:.35;cursor:default}
-.dk-zoom{display:flex;align-items:center;border:1px solid var(--line-2);flex:0 0 auto}
+.dk-zoom,.dk-tr{display:flex;align-items:center;border:1px solid var(--line-2);flex:0 0 auto}
+.dk-tr button{border:0!important;padding:4px 9px!important;font-size:11px!important}
+.dk-tr #dkPlay{min-width:36px;border-left:1px solid var(--line-2)!important;border-right:1px solid var(--line-2)!important;color:var(--accent)}
+.dk-tr button:disabled{opacity:.3}
 .dk-zoom button{border:0!important;padding:4px 8px!important;font-size:11px!important}
 .dk-zoom #dkZoomTxt{min-width:42px;text-align:center;font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-dim);cursor:pointer;border-left:1px solid var(--line-2);border-right:1px solid var(--line-2);padding:4px 4px}
 .dk-zoom #dkZoomTxt:hover{color:var(--ink)}
@@ -568,6 +571,7 @@ body.preview .panel{display:none}
     <div class="dk-h">
       <span class="dk-t">Arrangement</span><span class="dk-s" id="dkStat"></span><span class="sp"></span>
       <span class="dk-hint" id="dkHint">glissez looks, calques et clips sur les pistes · déplacez les blocs, tirez les bords pour rogner · Maj : sans aimant · B coupe · Suppr retire</span>
+      <span class="dk-tr"><button id="dkPrevKf" type="button" title="image-clé précédente (,)">|◆</button><button id="dkPlay" type="button" title="lecture / pause (Espace)">▶</button><button id="dkNextKf" type="button" title="image-clé suivante (.)">◆|</button></span>
       <span class="dk-zoom"><button id="dkZoomOut" type="button" title="zoom arrière · Ctrl + molette">−</button><span id="dkZoomTxt" title="afficher tout le morceau">tout</span><button id="dkZoomIn" type="button" title="zoom avant · Ctrl + molette sur la timeline">+</button></span>
       <button id="dkUndo" type="button" title="annuler la dernière retouche de la timeline (Ctrl+Z)">↶</button>
       <button id="dkRedo" type="button" title="rétablir (Ctrl+Maj+Z)">↷</button>
@@ -639,6 +643,7 @@ body.preview .panel{display:none}
     <div class="krow"><span>Aperçu plein écran</span><b>F</b></div>
     <div class="krow"><span>Lecture / pause (ou clic sur l'image)</span><b>Espace</b></div>
     <div class="krow"><span>Guide et FAQ</span><b>H</b></div>
+    <div class="krow"><span>Image-clé précédente / suivante</span><b>, .</b></div>
     <div class="krow"><span>Cette fiche</span><b>?</b></div>
     <button class="guidebtn" id="sheetGuide" type="button">Ouvrir le guide complet</button>
     <button class="close" id="sheetClose">Fermer</button>
@@ -784,7 +789,7 @@ body.preview .panel{display:none}
   </table>
   <h3>Images-clés</h3>
   <p>Chaque réglage à curseur peut changer au fil du morceau. Un <b>◇</b> se trouve à droite de son nom : avec une musique chargée, cliquez-le pour poser une <b>image-clé</b> à la position de lecture, avec la valeur du moment. Déplacez-vous dans le morceau, changez la valeur, posez-en une autre : le réglage glisse en douceur de l'une à la suivante, et reste fixe avant la première et après la dernière.</p>
-  <ul><li>Un réglage animé affiche <b>◆</b> ; une fois qu'il a des images-clés, chaque mouvement de son curseur en pose ou en met une à jour à la position de lecture.</li><li>Un clic sur ◆ à l'instant exact d'une image-clé la retire ; un clic droit efface toutes celles du réglage. Ctrl Z annule.</li><li>Les images-clés apparaissent en losanges blancs sur la piste du calque dans la timeline ; cliquer la piste à cet endroit y amène la lecture.</li><li>L'opacité, l'échelle, la rotation, la position et la pulsation audio s'animent aussi. Les exports suivent exactement les mêmes images-clés.</li></ul>
+  <ul><li>Un réglage animé affiche <b>◆</b> ; une fois qu'il a des images-clés, chaque mouvement de son curseur en pose ou en met une à jour à la position de lecture.</li><li>Un clic sur ◆ à l'instant exact d'une image-clé la retire ; un clic droit efface toutes celles du réglage. Ctrl Z annule.</li><li>Pour se placer exactement sur une image-clé, les boutons <b>|◆</b> et <b>◆|</b> de la timeline (ou les touches <kbd>,</kbd> et <kbd>.</kbd>) vont à la précédente ou à la suivante, mettent la lecture en pause et sélectionnent le calque concerné : un clic sur ◆ la retire alors.</li><li>Les images-clés apparaissent en losanges blancs sur la piste du calque dans la timeline ; cliquer la piste à cet endroit y amène la lecture.</li><li>L'opacité, l'échelle, la rotation, la position et la pulsation audio s'animent aussi. Les exports suivent exactement les mêmes images-clés.</li></ul>
 </section>
 
 <section id="g-camera">
@@ -949,7 +954,7 @@ body.preview .panel{display:none}
     <li><i>2</i><span><b>Pistes</b> — une par calque, dans le même ordre que la liste des calques.</span></li>
     <li><i>3</i><span><b>Glissez</b> un look, un calque ou un clip sur la timeline au moment voulu : il se pose en bloc que vous pouvez rogner.</span></li>
     <li><i>4</i><span><b>Vos</b> blocs portent un ◆. Au survol : <b>✕</b> le retire, <b>↺</b> ramène le bloc du réalisateur que vous avez modifié.</span></li>
-    <li><i>5</i><span><b>Tête de lecture</b> — cliquez sur les pistes pour sauter ; <kbd>Ctrl</kbd> + molette zoome.</span></li>
+    <li><i>5</i><span><b>Tête de lecture</b> — cliquez sur les pistes pour sauter, glissez sur la règle pour parcourir le morceau en pause ; <b>▶</b> lance ou arrête la lecture, <b>|◆ ◆|</b> vont à l'image-clé précédente ou suivante ; <kbd>Ctrl</kbd> + molette zoome.</span></li>
   </ul>
   <h3>Édition</h3>
   <ul>
@@ -960,7 +965,7 @@ body.preview .panel{display:none}
     <li><b>Clips</b> : la piste VJ Deck montre le montage du réalisateur — chaque clip, quand il commence et quand il finit — et le deck joue exactement cela. Déplacez, rognez, coupez ou retirez-en un comme n'importe quel bloc ; en retirer un laisse une plage vide (hachurée — ↺ la rend, ou déposez-y un autre clip). Une vignette de clip déposée sur la piste joue depuis sa première image, en coupe franche, et rogne ce qu'elle recouvre, comme dans tout éditeur.</li>
     <li><b>↶ ↷</b> (ou <kbd>Ctrl Z</kbd> / <kbd>Ctrl Maj Z</kbd>) annulent et rétablissent ; <b>Effacer les retouches</b> rend tout le montage au réalisateur ; <b>↻ Nouveau montage</b> en crée un autre en gardant chaque retouche ; <b>Réalisateur · activé/désactivé</b> vous donne les commandes (vos blocs jouent toujours) ; <b>⤓ Script</b> télécharge la session avec vos retouches.</li>
     <li><b>Un calque ajouté pendant la jam</b> apparaît comme une ligne continue : il joue tout le morceau. Pour lui donner un début et une fin, tracez directement sur sa piste (pressez au début voulu, relâchez à la fin), ou glissez-le depuis la liste des calques : il devient un bloc que vous déplacez et rognez comme les autres.</li>
-    <li><b>Naviguer</b> : cliquez sur les pistes pour sauter, pressez et glissez le long de la règle pour parcourir le morceau, <kbd>Ctrl</kbd> + molette pour zoomer autour du pointeur. Glissez le bord supérieur de la timeline pour l'agrandir : les pistes grandissent avec elle ; <b>▾</b> la replie.</li>
+    <li><b>Naviguer</b> : <b>▶</b> dans l'en-tête (ou <kbd>Espace</kbd>) lance et arrête la lecture ; cliquez sur les pistes pour sauter sans changer l'état de lecture ; pressez et glissez le long de la règle pour parcourir le morceau — la lecture se met en pause pendant que vous déplacez la tête ; <b>|◆</b> et <b>◆|</b> (touches <kbd>,</kbd> et <kbd>.</kbd>) sautent à l'image-clé précédente ou suivante ; <kbd>Ctrl</kbd> + molette pour zoomer autour du pointeur. Glissez le bord supérieur de la timeline pour l'agrandir : les pistes grandissent avec elle ; <b>▾</b> la replie.</li>
   </ul>
   <div class="gd-tip"><b>Les calques en gris</b> dans la liste sont des looks qui attendent leur phrase : l'étiquette dit quand le réalisateur les fait entrer (<i>à 1:20</i>).</div>
 </section>
@@ -1159,6 +1164,7 @@ body.preview .panel{display:none}
     <tr><td><kbd>Ctrl Z</kbd> · <kbd>Ctrl Maj Z</kbd></td><td>Annuler · rétablir</td></tr>
     <tr><td><kbd>Entrée</kbd></td><td>Lancer le rendu (dialogue d'export)</td></tr>
     <tr><td><kbd>Échap</kbd></td><td>Fermer un dialogue ou ce guide</td></tr>
+    <tr><td><kbd>,</kbd> · <kbd>.</kbd></td><td>Image-clé précédente · suivante (en pause, le calque concerné est sélectionné)</td></tr>
     <tr><td><kbd>Ctrl</kbd> + molette</td><td>Zoomer la timeline</td></tr>
     <tr><td><kbd>Alt</kbd> + glisser</td><td>Copier un bloc sur la timeline</td></tr>
     <tr><td><kbd>Maj</kbd> + glisser</td><td>Déplacer ou rogner sans l'aimant de la grille</td></tr>
@@ -4005,6 +4011,21 @@ let _kfDockT=0;
 function kfAutoKey(L,key,val,el){if(!kfList(L,key))return;const t=kfTime();if(t==null)return;kfSet(L,key,t,val);if(el&&el._kf)el._kf.paint();
   // the track's diamonds follow, once the slider has come to rest
   if(SCRIPT.data){clearTimeout(_kfDockT);_kfDockT=setTimeout(dockRender,400);}}
+// every keyframe of every layer, in time order
+function kfTimes(){const out=[];layers.forEach(L=>{if(!L.kf)return;for(const k in L.kf)(L.kf[k]||[]).forEach(q=>out.push({t:q.t,L:L}));});return out.sort((a,b)=>a.t-b.t);}
+// jump to the previous or next keyframe, paused and selecting its layer, so ◆ is
+// right on it and one click removes it
+function kfStep(dir){
+  if(!AUDIO.el){toast("chargez un morceau pour naviguer entre les images-clés");return;}
+  const now=AUDIO.now(),list=kfTimes();
+  if(!list.length){toast("aucune image-clé");return;}
+  const hit=dir>0?list.find(q=>q.t>now+.06):list.slice().reverse().find(q=>q.t<now-.06);
+  if(!hit){toast(dir>0?"dernière image-clé":"première image-clé");return;}
+  setPlaying(false);seekTo(hit.t);
+  const i=layers.indexOf(hit.L);if(i>=0&&i!==sel){sel=i;renderLayerList();renderControls();}
+  kfSyncControls();
+  toast("image-clé à "+fmtTs(hit.t)+" · "+layerTitle(hit.L));
+}
 function kfSyncControls(){const L=layers[sel];if(!L||!L.kf)return;controlsEl.querySelectorAll(".ctrl").forEach(el=>{if(el._kf)el._kf.sync();});}
 function schemaLabel(tool,k){const e=(tool.schema||[]).filter(x=>x&&x.key===k)[0];return e?e.label:k;}
 // during a jam, say who owns the layer: the director, or you
@@ -4352,9 +4373,20 @@ preFile.onchange=()=>{
 const musicBtn=document.getElementById("music"),musicTxt=document.getElementById("musicTxt"),musicFile=document.getElementById("musicFile");
 // the picture is the play button: a click on it pauses or plays the music (a drag
 // does not), and so does the space bar
+// play or pause, and every control that shows it: the music chip, the dock's ▶
+function setPlaying(on){
+  if(!AUDIO.el)return false;
+  if(on){if(AUDIO.ctx)AUDIO.ctx.resume();const g=AUDIO.el.play();if(g&&g.catch)g.catch(()=>{});}else AUDIO.el.pause();
+  musicBtn.classList.toggle("on",on);musicTxt.textContent=on?"♪ Lecture":"♪ Pause";
+  const b=document.getElementById("dkPlay");if(b)b.textContent=on?"❚❚":"▶";
+  return on;
+}
+// move the playhead to a moment of the song, compensating the output latency
+// so AUDIO.now() reads exactly that moment (a keyframe sits on it to the frame)
+function seekTo(t){if(!AUDIO.el)return;try{AUDIO.el.currentTime=Math.max(0,t+AUDIO.lat());}catch(e){}SCRIPT.cur=-1;SCRIPT.ev=-1;}
 function togglePlay(){
   if(!AUDIO.el){toast("chargez d'abord un morceau — ♪ Musique ou une Jam Session");return;}
-  const playing=AUDIO.toggle();musicBtn.classList.toggle("on",playing);musicTxt.textContent=playing?"♪ Lecture":"♪ Pause";
+  const playing=setPlaying(AUDIO.el.paused);
   const f=document.getElementById("playfx");if(f){f.textContent=playing?"▶":"❚❚";f.classList.remove("go");void f.offsetWidth;f.classList.add("go");}
 }
 musicBtn.onclick=()=>{if(AUDIO.el)togglePlay();else musicFile.click();};
@@ -5965,9 +5997,7 @@ dkScroll.addEventListener("click",e=>{
   if(!SCRIPT.data||!AUDIO.el||performance.now()-_dkDrew<400||e.target.closest(".bk,.x,.u,.rr,.dk-lab,button"))return;
   const r=dkTracks.getBoundingClientRect();if(e.clientX<r.left)return;
   if(TL.sel){TL.sel=null;dkContent.querySelectorAll(".bk.sel").forEach(x=>x.classList.remove("sel"));}
-  try{AUDIO.el.currentTime=tlTimeAt(e.clientX);}catch(err){}
-  SCRIPT.cur=-1;SCRIPT.ev=-1;
-  if(AUDIO.el.paused){const g=AUDIO.el.play();if(g&&g.catch)g.catch(()=>{});musicBtn.classList.add("on");}
+  seekTo(tlTimeAt(e.clientX));
 });
 dkScroll.addEventListener("mousemove",e=>{
   if(!SCRIPT.data)return;const r=dkTracks.getBoundingClientRect(),hv=document.getElementById("dkHover");
@@ -5976,10 +6006,11 @@ dkScroll.addEventListener("mousemove",e=>{
   hv.style.display="block";hv.style.left=(x*100)+"%";hv.dataset.t=fmtTs(x*SCRIPT.data.track.duration);
 });
 dkScroll.addEventListener("mouseleave",()=>{document.getElementById("dkHover").style.display="none";});
-// the ruler scrubs: press and drag along it to move through the song
+// the ruler scrubs: press and drag along it to move through the song, paused
 document.getElementById("dkRuler").addEventListener("pointerdown",e=>{
   if(!SCRIPT.data||!AUDIO.el||e.button!==0)return;e.preventDefault();
-  const go=ev=>{try{AUDIO.el.currentTime=tlTimeAt(ev.clientX);}catch(err){}SCRIPT.cur=-1;SCRIPT.ev=-1;};
+  setPlaying(false);
+  const go=ev=>seekTo(tlTimeAt(ev.clientX));
   go(e);
   const up=()=>{window.removeEventListener("pointermove",go);window.removeEventListener("pointerup",up);};
   window.addEventListener("pointermove",go);window.addEventListener("pointerup",up);
@@ -6166,6 +6197,7 @@ function dockRender(){
   document.getElementById("dkHint").style.display=pins?"none":"";
   const dir=document.getElementById("dkDir");dir.textContent="Réalisateur · "+(SCRIPT.on?"activé":"désactivé");dir.classList.toggle("on",SCRIPT.on);
   document.getElementById("dkUndo").disabled=!TL.hist.length;document.getElementById("dkRedo").disabled=!TL.fut.length;
+  const anyKf=layers.some(L=>L.kf&&Object.keys(L.kf).length);document.getElementById("dkPrevKf").disabled=!anyKf;document.getElementById("dkNextKf").disabled=!anyKf;
   dockPalette();
   const D=sc.track.duration,TW=dkTracks.clientWidth||dkTrackW()*DKZ;
   // ruler: tick spacing follows the zoom
@@ -6192,7 +6224,7 @@ function dockRender(){
   requestAnimationFrame(dockWave);
 }
 const timelineRender=dockRender;
-let _dkPulse=-1,_dkLit=-1;
+let _dkPulse=-1,_dkLit=-1,_dkPlaying=null;
 // per frame: the playhead, its pulse on the kick, the phrase that is playing, and
 // when zoomed in, the view follows the song unless the user is looking elsewhere
 function timelineTick(){
@@ -6200,6 +6232,7 @@ function timelineTick(){
   const now=AUDIO.now(),ph=document.getElementById("dkPh");
   ph.style.left=dkPct(now).toFixed(3)+"%";
   const hit=Math.round((AUDIO.hit||0)*20)/20;if(hit!==_dkPulse){_dkPulse=hit;ph.style.setProperty("--pulse",hit);}
+  const playing=AUDIO.playing();if(playing!==_dkPlaying){_dkPlaying=playing;document.getElementById("dkPlay").textContent=playing?"❚❚":"▶";}
   if(Math.abs(now-_dkLit)>.04){_dkLit=now;
     dockEl.querySelectorAll("#dkRows .bk").forEach(b=>b.classList.toggle("now",now>=b._t0&&now<b._t1));
     const si=sc.sections.findIndex(q=>now>=q.at&&now<q.at+q.len);
@@ -6211,6 +6244,9 @@ function timelineTick(){
   }
 }
 if(window.ResizeObserver)new ResizeObserver(()=>{if(dockEl.classList.contains("on")){dockLayout();dockWave();}}).observe(dkScroll);
+document.getElementById("dkPlay").onclick=togglePlay;
+document.getElementById("dkPrevKf").onclick=()=>kfStep(-1);
+document.getElementById("dkNextKf").onclick=()=>kfStep(1);
 document.getElementById("dkRoll").onclick=()=>startJam({reroll:true});
 document.getElementById("dkSave").onclick=saveJamScript;
 document.getElementById("dkUndo").onclick=tlUndo;
@@ -6409,6 +6445,7 @@ window.addEventListener("keydown",e=>{
     if(e.key==="ArrowLeft"||e.key==="ArrowRight"){e.preventDefault();tlNudge(e.key==="ArrowLeft"?-1:1,e.shiftKey);return;}
     if(e.key==="Escape"){TL.sel=null;renderLayerList();return;}
   }
+  if(e.key===","||e.key==="."){if(AUDIO.el){e.preventDefault();kfStep(e.key==="."?1:-1);}return;}
   if(e.key==="?"||(e.shiftKey&&e.key==="/")){e.preventDefault();toggleSheet();}
   else if(e.key==="Escape"&&jamEl.classList.contains("open"))closeJam();
   else if(e.key==="Escape"&&sheet.classList.contains("open"))toggleSheet(false);
