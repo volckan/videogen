@@ -218,6 +218,9 @@ body.preview .dock{display:none!important}
 #dkGhost i{width:8px;height:8px;border-radius:50%;display:block}
 .layer[draggable=true]{cursor:grab}
 .layer[draggable=true]:active{cursor:grabbing}
+.layer.dragging{opacity:.35}
+.layer.drop-before{box-shadow:0 -3px 0 0 var(--accent)}
+.layer.drop-after{box-shadow:0 3px 0 0 var(--accent)}
 /* who owns a layer during a jam: the director, or you */
 .dirnote{margin:10px 16px 2px;padding:8px 10px;border:1px solid var(--line-2);border-left:2px solid var(--accent);font-family:var(--mono);font-size:10px;line-height:1.5;letter-spacing:.02em;color:var(--ink-dim);background:var(--surface-2)}
 .dirnote b{color:var(--ink);font-weight:700}
@@ -719,7 +722,7 @@ body.preview .panel{display:none}
   </div>
   <p class="gd-cap">Quatre calques ajoutés un à un. Un calque Traitement transforme tout ce qui se trouve dessous.</p>
   <h3>Dans la liste des calques</h3>
-  <ul><li><b>◉</b> affiche ou masque un calque · <b>▲ ▼</b> le déplacent · <b>⧉</b> le duplique · <b>✕</b> le supprime.</li><li><b>＋ Ajouter</b> place un nouveau calque en haut (sous Post FX, qui reste toujours dernier).</li><li><b>Copier les réglages / Coller les réglages</b> transportent un look d'un calque à un autre.</li></ul>
+  <ul><li><b>◉</b> affiche ou masque un calque · <b>▲ ▼</b> le déplacent, ou glissez-le à la souris à sa nouvelle place · <b>⧉</b> le duplique · <b>✕</b> le supprime.</li><li><b>＋ Ajouter</b> place un nouveau calque en haut (sous Post FX, qui reste toujours dernier).</li><li><b>Copier les réglages / Coller les réglages</b> transportent un look d'un calque à un autre.</li></ul>
   <h3>Modes de fusion</h3>
   <p><b>Normal</b> recouvre ce qui est dessous. <b>Superposition</b> et <b>Éclaircir</b> n'ajoutent que de la lumière — idéal pour les halos, les particules et la fumée. <b>Produit</b> assombrit, <b>Incrustation</b> et <b>Lumière crue</b> ajoutent du contraste, <b>Différence</b> inverse là où les calques se chevauchent.</p>
   <h3>Types de calques</h3>
@@ -3659,6 +3662,33 @@ async function renderAt(target){
 }
 
 const layerList=document.getElementById("layerList");
+/* ---- reorder by drag and drop: the row follows the pointer, a bar shows where it lands ---- */
+let LDRAG=null;
+function layerDropClear(){layerList.querySelectorAll(".drop-before,.drop-after").forEach(x=>x.classList.remove("drop-before","drop-after"));}
+// the row under the pointer and whether the drop lands above or below it
+function layerDropAt(e){const row=e.target.closest(".layer");if(!row||!layerList.contains(row))return null;
+  const r=row.getBoundingClientRect();return{row:row,after:e.clientY>r.top+r.height/2};}
+layerList.addEventListener("dragover",e=>{
+  // a row that also drags onto the timeline was started as a "copy" drag: the effect must match or the drop is refused
+  if(!LDRAG)return;e.preventDefault();try{e.dataTransfer.dropEffect=DRAG?"copy":"move";}catch(err){}
+  const d=layerDropAt(e);layerDropClear();
+  if(d&&d.row._layer!==LDRAG)d.row.classList.add(d.after?"drop-after":"drop-before");
+});
+layerList.addEventListener("dragleave",e=>{if(!layerList.contains(e.relatedTarget))layerDropClear();});
+layerList.addEventListener("drop",e=>{
+  if(!LDRAG)return;e.preventDefault();e.stopPropagation();
+  const d=layerDropAt(e),L=LDRAG;layerDropClear();LDRAG=null;
+  if(!d||!d.row._layer||d.row._layer===L)return;
+  // the list reads top of the stack first: work in that order, then store it back
+  const vis=layers.slice().reverse().filter(x=>x!==L);
+  let at=vis.indexOf(d.row._layer);if(at<0)return;if(d.after)at++;
+  const from=layers.indexOf(L);
+  vis.splice(at,0,L);
+  const next=vis.reverse();
+  if(next.indexOf(L)===from)return;
+  pushHistory();layers=next;sel=layers.indexOf(L);
+  renderLayerList();renderControls();toast("ordre des calques modifié");
+});
 // when the director brings a parked look back (the next loop counts too)
 function nextLookTime(id){
   const sc=SCRIPT.data;if(!sc)return null;
@@ -3690,11 +3720,16 @@ function renderLayerList(noDock){
   layerList.innerHTML="";
   for(let i=layers.length-1;i>=0;i--){const L=layers[i];const el=document.createElement("div");el.className="layer"+(i===sel?" sel":"")+(L.visible?"":" off")+(L.look&&!L.visible?" parked":"");
     if(L.look&&!L.visible&&SCRIPT.data){const nt=nextLookTime(L.look);el.title=nt===null?"non programmé dans ce montage":"en attente \u2014 le réalisateur l'amène à "+fmtT(nt);}
-    if(dockSchedulable(L)){el.draggable=true;
-      el.addEventListener("dragstart",e=>dockDragStart(e,{kind:"layer",layer:L}));el.addEventListener("dragend",dockDragEnd);
-      el.title=(el.title?el.title+"  \u00b7  ":"")+"glissez sur la timeline pour choisir quand il joue";}
+    // every row drags to change the order; a schedulable one also drags onto the timeline
+    el.draggable=true;const sched=dockSchedulable(L);
+    el.addEventListener("dragstart",e=>{LDRAG=L;el.classList.add("dragging");
+      if(sched)dockDragStart(e,{kind:"layer",layer:L});
+      else{try{e.dataTransfer.setData("text/plain","videogen");e.dataTransfer.effectAllowed="move";}catch(err){}}});
+    el.addEventListener("dragend",()=>{LDRAG=null;el.classList.remove("dragging");layerDropClear();if(sched)dockDragEnd();});
+    el.title=(el.title?el.title+"  \u00b7  ":"")+(sched?"glissez sur la timeline pour choisir quand il joue, ou dans la liste pour changer l'ordre":"glissez pour changer l'ordre");
     el.innerHTML='<span class="eye">'+(L.visible?"◉":"◎")+'</span><span class="nm">'+layerTitle(L)+'</span>'+lookTag(L)+
       '<span class="mini up" title="monter">▲</span><span class="mini dn" title="descendre">▼</span><span class="mini dup" title="dupliquer">⧉</span><span class="mini del" title="supprimer">✕</span>';
+    el._layer=L;
     el.onclick=e=>{if(e.target.classList.contains("mini")||e.target.classList.contains("eye"))return;sel=i;renderLayerList();renderControls();};
     el.querySelector(".eye").onclick=e=>{e.stopPropagation();L.visible=!L.visible;renderLayerList();};
     el.querySelector(".up").onclick=e=>{e.stopPropagation();if(i<layers.length-1){[layers[i],layers[i+1]]=[layers[i+1],layers[i]];if(sel===i)sel=i+1;else if(sel===i+1)sel=i;renderLayerList();renderControls();}};
