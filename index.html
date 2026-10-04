@@ -299,6 +299,27 @@ body.preview .panel{display:none}
 @media (max-width:560px){.jslots{grid-template-columns:1fr}}
 .sheet{position:fixed;inset:0;z-index:320;background:rgba(6,6,8,.82);display:none;align-items:center;justify-content:center;padding:24px}
 .sheet.open{display:flex}
+/* modal: the browser's prompt and confirm, in the studio's own clothes */
+.modal{position:fixed;inset:0;z-index:340;background:rgba(6,6,8,.82);display:none;align-items:center;justify-content:center;padding:24px}
+.modal.open{display:flex}
+.modal-in{background:var(--surface);border:1px solid var(--line-2);border-left:2px solid var(--accent);max-width:460px;width:100%;padding:22px;animation:modalin .18s ease-out}
+.modal.danger .modal-in{border-left-color:var(--danger)}
+@keyframes modalin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.modal-in{animation:none}}
+.modal h3{font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);font-weight:400;margin-bottom:12px}
+.modal.danger h3{color:var(--danger)}
+.modal p{font-size:13px;line-height:1.55;color:var(--ink-dim);white-space:pre-line;margin:0}
+.modal p b{color:var(--ink);font-weight:600}
+.modal input{display:block;width:100%;margin-top:14px;background:var(--surface-2);border:1px solid var(--line-2);color:var(--ink);font-family:var(--font);font-size:14px;padding:9px 10px;outline:none}
+.modal input:focus{border-color:var(--accent)}
+.modal input[hidden]{display:none}
+.modal .mrow{display:flex;gap:8px;margin-top:18px}
+.modal .mrow button{flex:1;font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;padding:10px;border:1px solid var(--line-2);color:var(--ink-dim);transition:.15s}
+.modal .mrow button:hover{color:var(--ink);border-color:var(--ink-dim)}
+.modal .mrow .ok{border-color:var(--accent);color:var(--accent)}
+.modal .mrow .ok:hover{background:var(--accent);color:#000}
+.modal.danger .mrow .ok{border-color:var(--danger);color:var(--danger)}
+.modal.danger .mrow .ok:hover{background:var(--danger);color:#fff}
 .sheet-in{background:var(--surface);border:1px solid var(--line-2);max-width:460px;width:100%;padding:22px}
 .sheet h3{font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-faint);font-weight:400;margin-bottom:14px}
 .krow{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--line);font-size:13px;color:var(--ink-dim)}
@@ -680,6 +701,7 @@ body.present:not(.idle) .preshud{opacity:1}
   </div>
 </div>
 
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalT"><div class="modal-in"><h3 id="modalT"></h3><p id="modalP"></p><input id="modalI" type="text" hidden><div class="mrow"><button type="button" id="modalNo"></button><button type="button" class="ok" id="modalOk"></button></div></div></div>
 <div class="sheet" id="sheet" role="dialog" aria-label="Raccourcis clavier">
   <div class="sheet-in">
     <h3>Raccourcis</h3>
@@ -4819,16 +4841,16 @@ async function presetAdd(name,specs,fonts,thumb,replace){
 }
 async function presetSave(){
   if(!layers.length)return;
-  const name=(prompt("Nom du preset :",curPresetName&&!ALLPRESETS.some(p=>p.name===curPresetName&&!p.user)?curPresetName:"Mon preset")||"").trim();
+  const name=(await ask({title:"Enregistrer un preset",text:"La composition actuelle, avec ses réglages et ses polices, rejoint « Mes presets ».",input:true,placeholder:"Nom du preset",ok:"Enregistrer",value:curPresetName&&!ALLPRESETS.some(p=>p.name===curPresetName&&!p.user)?curPresetName:"Mon preset"})||"").trim();
   if(!name)return;
   const exists=USER_PRESETS.some(p=>p.name===name);
-  if(exists&&!confirm("Un preset « "+name+" » existe déjà. Le remplacer ?"))return;
+  if(exists&&!await ask({title:"Preset existant",text:"Un preset « "+name+" » existe déjà. Le remplacer ?",ok:"Remplacer"}))return;
   const pr=await presetAdd(name,serializeLayers(layers),await fontsForExport(),"",exists);
   curCat=USER_CAT;curPresetName=pr.name;renderCats();renderGallery();
   await presetsStore();toast(exists?"preset « "+pr.name+" » remplacé":"preset « "+pr.name+" » enregistré");
 }
 async function presetDelete(pr){
-  if(!confirm("Supprimer le preset « "+pr.name+" » ?"))return;
+  if(!await ask({title:"Supprimer un preset",text:"Supprimer le preset « "+pr.name+" » ? Cette action est définitive.",ok:"Supprimer",danger:true}))return;
   const i=USER_PRESETS.indexOf(pr);if(i>=0)USER_PRESETS.splice(i,1);
   delete thumbCache[thumbKey(pr)];refreshPresets();renderGallery();await presetsStore();toast("preset supprimé");
 }
@@ -5013,7 +5035,7 @@ function openArrangement(){
 document.getElementById("arrBtn").onclick=openArrangement;
 // start over: the saved session, the media it holds and the preferences go; the page reloads on the first preset
 document.getElementById("resetBtn").onclick=async()=>{
-  if(!confirm("Réinitialiser VideoGen ?\n\nLa composition en cours, la session enregistrée (avec ses fichiers et polices), vos presets (Mes presets — exportez-les d'abord si vous y tenez) et les préférences seront effacés. Les fichiers que vous avez téléchargés ne sont pas concernés."))return;
+  if(!await ask({title:"Réinitialiser VideoGen",html:"La composition en cours, la session enregistrée (avec ses fichiers et polices), <b>vos presets</b> (Mes presets — exportez-les d'abord si vous y tenez) et les préférences seront effacés.\n\nLes fichiers que vous avez téléchargés ne sont pas concernés.",ok:"Tout effacer",cancel:"Garder",danger:true}))return;
   AUTOSAVE.on=false;
   try{if(AUDIO.el)AUDIO.el.pause();}catch(e){}
   try{Object.keys(localStorage).filter(k=>k.indexOf("videogen")===0).forEach(k=>localStorage.removeItem(k));}catch(e){}
@@ -7094,6 +7116,35 @@ function jamRerollSection(i){
 
 
 const sheet=document.getElementById("sheet");
+/* ---- modal: one question at a time, answered with a promise ----
+   ask({title,text,ok,cancel,input,value,danger}) resolves to the text typed
+   (input mode) or true / false; Esc and the backdrop cancel. */
+const MODAL={el:document.getElementById("modal"),res:null,prev:null};
+function ask(o){
+  return new Promise(res=>{
+    if(MODAL.res)MODAL.res(MODAL.inp?null:false);   // a question still open yields to the new one
+    MODAL.res=res;MODAL.inp=!!o.input;MODAL.prev=document.activeElement;MODAL.t=performance.now();
+    const el=MODAL.el,inp=document.getElementById("modalI");
+    document.getElementById("modalT").textContent=o.title||"VideoGen";
+    document.getElementById("modalP").innerHTML=o.html||"";if(!o.html)document.getElementById("modalP").textContent=o.text||"";
+    document.getElementById("modalOk").textContent=o.ok||"OK";
+    document.getElementById("modalNo").textContent=o.cancel||"Annuler";
+    inp.hidden=!o.input;inp.value=o.value||"";inp.placeholder=o.placeholder||"";
+    el.classList.toggle("danger",!!o.danger);el.classList.add("open");
+    setTimeout(()=>{if(o.input){inp.focus();inp.select();}else document.getElementById("modalOk").focus();},0);
+  });
+}
+function modalClose(v){
+  const r=MODAL.res;if(!r)return;MODAL.res=null;MODAL.el.classList.remove("open");
+  try{if(MODAL.prev&&MODAL.prev.focus)MODAL.prev.focus();}catch(e){}
+  r(v);
+}
+function modalOk(){const inp=document.getElementById("modalI");modalClose(MODAL.inp?inp.value:true);}
+function modalNo(){modalClose(MODAL.inp?null:false);}
+document.getElementById("modalOk").onclick=modalOk;
+document.getElementById("modalNo").onclick=modalNo;
+MODAL.el.addEventListener("click",e=>{if(e.target===MODAL.el)modalNo();});
+document.getElementById("modalI").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();e.stopPropagation();modalOk();}});
 function toggleSheet(on){sheet.classList.toggle("open",on===undefined?!sheet.classList.contains("open"):on);}
 document.getElementById("sheetClose").onclick=()=>toggleSheet(false);
 sheet.onclick=e=>{if(e.target===sheet)toggleSheet(false);};
@@ -7208,6 +7259,9 @@ document.getElementById("sheetGuide").onclick=()=>{toggleSheet(false);openGuide(
 window.addEventListener("keydown",e=>{
   if(RSETUP){if(e.key==="Enter"){e.preventDefault();RSETUP.go(true);}else if(e.key==="Escape"){e.preventDefault();RSETUP.go(false);}else if(e.key!=="Tab")e.preventDefault();return;}
   if(REND){if(e.key!=="Tab")e.preventDefault();return;}
+  // the key that answered one question must not answer the next one opened in its wake
+  if(MODAL.res){if(performance.now()-MODAL.t<200){if(e.key==="Enter"||e.key==="Escape")e.preventDefault();return;}
+    if(e.key==="Escape"){e.preventDefault();modalNo();}else if(e.key==="Enter"&&document.activeElement!==document.getElementById("modalNo")){e.preventDefault();modalOk();}return;}
   // the guide is a page of its own: Esc closes it, nothing else edits the set behind it
   if(!guideEl.hidden){if(e.key==="Escape"){e.preventDefault();closeGuide();}return;}
   const typing=/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName);
