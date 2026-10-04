@@ -687,7 +687,7 @@ body.preview .panel{display:none}
     <figure class="gfig"><div class="gshot" data-shot="preset:Fire Up"></div><figcaption>Fire Up</figcaption></figure>
     <figure class="gfig"><div class="gshot" data-shot="preset:Hyperzoom"></div><figcaption>Hyperzoom</figcaption></figure>
   </div>
-  <p class="gd-cap">Quatre des 45 presets, rendus en direct par l'application elle-même.</p>
+  <p class="gd-cap">Quatre des 48 presets, rendus en direct par l'application elle-même.</p>
   <div class="gd-tip">Votre travail est <b>sauvegardé automatiquement</b> dans ce navigateur : si l'onglet se ferme, l'ouverture suivante propose de reprendre la session là où elle en était, fichiers compris.</div>
 </section>
 
@@ -744,6 +744,8 @@ body.preview .panel{display:none}
   <p class="gd-cap">Quatre calques ajoutés un à un. Un calque Traitement transforme tout ce qui se trouve dessous.</p>
   <h3>Dans la liste des calques</h3>
   <ul><li><b>◉</b> affiche ou masque un calque · <b>▲ ▼</b> le déplacent, ou glissez-le à la souris à sa nouvelle place · <b>⧉</b> le duplique · <b>✕</b> le supprime.</li><li><b>＋ Ajouter</b> place un nouveau calque en haut (sous Post FX, qui reste toujours dernier).</li><li><b>Copier les réglages / Coller les réglages</b> transportent un look d'un calque à un autre.</li></ul>
+  <h3>Masques</h3>
+  <p>Un calque <b>Masque</b> ne dessine rien : il garde, dans tout ce qui est en dessous de lui, la seule <b>source</b> qu'on lui donne — une forme, un dégradé, un texte (avec vos polices) ou des bandes — et retire le reste, qui prend la <b>couleur du fond</b> ou reste transparent. <b>Inverser</b> découpe la source au lieu de la garder ; <b>Bords fondus</b> adoucit la frontière ; <b>Intensité</b> dose la coupe. Le groupe Mouvement déplace, agrandit, tourne et fait pulser le masque sur la musique, et chaque réglage accepte des images-clés : un dégradé linéaire dont la <b>Position</b> va de 0 à 100 fait un volet, des <b>Bandes</b> qui défilent font un store. Placé au milieu de la pile, un masque ne touche pas les calques posés au-dessus de lui — un titre ou les paroles restent entiers.</p>
   <h3>Modes de fusion</h3>
   <p><b>Normal</b> recouvre ce qui est dessous. <b>Superposition</b> et <b>Éclaircir</b> n'ajoutent que de la lumière — idéal pour les halos, les particules et la fumée. <b>Produit</b> assombrit, <b>Incrustation</b> et <b>Lumière crue</b> ajoutent du contraste, <b>Différence</b> inverse là où les calques se chevauchent.</p>
   <h3>Types de calques</h3>
@@ -759,6 +761,7 @@ body.preview .panel{display:none}
     <tr><td>Forme 3D</td><td>Un objet 3D éclairé.</td></tr>
     <tr><td>Essaim · Particules</td><td>Des milliers de points : orbites et flux, ou un texte qui s'assemble, se disperse, explose ou tourbillonne.</td></tr>
     <tr><td>Halos</td><td>Reflets d'objectif et traînées de lumière.</td></tr>
+    <tr><td>Masque</td><td>Découpe tout ce qui est dessous : une forme (rectangle, ellipse, polygone, étoile), un dégradé, un texte ou des bandes ; inversable, bords fondus, intensité ; la zone retirée prend une couleur de fond ou reste transparente.</td></tr>
     <tr><td>Spectre</td><td>L'analyse en direct du son joué : barres, ligne, aire, points, cercle ou anneau ; bandes réparties sur une échelle logarithmique ou linéaire entre deux fréquences, gain, courbe, lissage et crêtes ; couleur unie, dégradée, par niveau ou arc-en-ciel. Sans musique, une respiration légère tient la place.</td></tr>
     <tr><td>Traitement</td><td>Un effet appliqué à tout ce qui est dessous : ASCII, points, tramage, pixel, RVB, CRT, glitch, thermique, kaléidoscope, tri de pixels, liquide, chrome, datamosh, VHS, griffonnage, énergie, 2.5D, Amiga.</td></tr>
     <tr><td>Micrographe</td><td>Un habillage technique façon HUD : grilles, nœuds, relevés.</td></tr>
@@ -871,7 +874,7 @@ body.preview .panel{display:none}
 
 <section id="g-ideas">
   <h2><span class="n">07</span>Presets, aléatoire et variations</h2>
-  <ul><li><b>Galerie</b> : 20 Intros (ouvertures avec titre) et 25 Scènes. Touchez pour charger.</li><li><b>⚄ Aléatoire</b> <kbd>G</kbd> construit une composition entièrement nouvelle.</li><li><b>≈ Varier</b> <kbd>V</kbd> décale un peu chaque réglage — la même idée, une autre prise.</li><li><b>◇ Mélanger</b> <kbd>R</kbd> retire les réglages de chaque calque et garde la pile.</li><li><b>↶ ↷</b> annulent et rétablissent n'importe quoi <kbd>Ctrl Z</kbd> <kbd>Ctrl Maj Z</kbd>.</li><li><b>⤓ Enregistrer</b> écrit la composition dans un fichier .json et <b>⤒ Charger</b> la ramène. Vos fichiers multimédias n'y sont pas inclus : gardez-les à côté.</li></ul>
+  <ul><li><b>Galerie</b> : 20 Intros (ouvertures avec titre) et 28 Scènes. Touchez pour charger.</li><li><b>⚄ Aléatoire</b> <kbd>G</kbd> construit une composition entièrement nouvelle.</li><li><b>≈ Varier</b> <kbd>V</kbd> décale un peu chaque réglage — la même idée, une autre prise.</li><li><b>◇ Mélanger</b> <kbd>R</kbd> retire les réglages de chaque calque et garde la pile.</li><li><b>↶ ↷</b> annulent et rétablissent n'importe quoi <kbd>Ctrl Z</kbd> <kbd>Ctrl Maj Z</kbd>.</li><li><b>⤓ Enregistrer</b> écrit la composition dans un fichier .json et <b>⤒ Charger</b> la ramène. Vos fichiers multimédias n'y sont pas inclus : gardez-les à côté.</li></ul>
   <button class="gd-go" type="button" data-go="random">Essayer ⚄ Aléatoire</button>
 </section>
 
@@ -916,7 +919,7 @@ body.preview .panel{display:none}
     <figure class="gfig"><div class="gshot" data-shot="look:sort"></div><figcaption>Tri de pixels</figcaption></figure>
     <figure class="gfig"><div class="gshot" data-shot="look:retro"></div><figcaption>Rétro</figcaption></figure>
   </div>
-  <p class="gd-cap">Six des quatorze looks que mixe le réalisateur, sur la même scène.</p>
+  <p class="gd-cap">Six des quinze looks que mixe le réalisateur, sur la même scène.</p>
   <p>Le <b>VJ Deck</b> mixe vos photos et clips : il coupe au demi-temps, au temps, à la mesure ou toutes les 4 mesures, avec des transitions coupe, fondu, flash, glissement, zoom ou double exposition. Les photos reçoivent une lente avancée, les vidéos redémarrent à chaque coupe.</p>
   <div class="gd-tip">Les réglages que vous touchez sont à vous : changez la saturation d'un calque et le réalisateur la garde pour le reste de la jam. Le panneau vous dit ce qui est à vous ; <b>↺ le rendre au réalisateur</b> l'annule.</div>
   <button class="gd-go" type="button" data-go="jam">Ouvrir la Jam Session</button>
@@ -2583,6 +2586,80 @@ video:{name:"Vidéo",accent:"#f0abfc",schema:[
   render(c,W,H,t,p,st){renderMedia(c,W,H,t,p,st,true);},
   randomize(p){p.fit=pick(["cover","contain"]);p.scale=+rand(.9,1.4).toFixed(2);p.speed=+rand(.5,1.6).toFixed(2);p.radius=Math.round(rand(0,80));p.feather=Math.round(rand(0,140));p.satF=+rand(.5,1.5).toFixed(2);p.parallax=+rand(0,1.2).toFixed(2);}
 },
+mask:{name:"Masque",accent:"#e0c3ff",masks:true,schema:[
+  {g:"Masque"},
+  {type:"seg",key:"kind",label:"Source",default:"shape",options:[{v:"shape",label:"Forme"},{v:"grad",label:"Dégradé"},{v:"text",label:"Texte"},{v:"stripes",label:"Bandes"}]},
+  {type:"toggle",key:"invert",label:"Inverser (découper la source)",default:false},
+  {type:"range",key:"amount",label:"Intensité",min:0,max:1,step:.01,default:1},
+  {type:"range",key:"feather",label:"Bords fondus",min:0,max:200,step:1,default:0},
+  {type:"range",key:"angle",label:"Angle",min:0,max:360,step:1,default:0},
+  {g:"Forme"},
+  {type:"seg",key:"shape",label:"Forme",default:"ellipse",options:[{v:"rect",label:"Rectangle"},{v:"ellipse",label:"Ellipse"},{v:"poly",label:"Polygone"},{v:"star",label:"Étoile"}]},
+  {type:"range",key:"w",label:"Largeur",min:2,max:160,step:1,default:60},
+  {type:"range",key:"h",label:"Hauteur",min:2,max:160,step:1,default:60},
+  {type:"range",key:"round",label:"Arrondi / pointes",min:0,max:1,step:.01,default:.2},
+  {type:"range",key:"sides",label:"Côtés / branches",min:3,max:12,step:1,default:6},
+  {g:"Dégradé"},
+  {type:"seg",key:"gmode",label:"Type",default:"linear",options:[{v:"linear",label:"Linéaire"},{v:"radial",label:"Radial"}]},
+  {type:"range",key:"gpos",label:"Position",min:0,max:100,step:1,default:50},
+  {type:"range",key:"gsoft",label:"Douceur",min:0,max:100,step:1,default:40},
+  {g:"Texte"},
+  {type:"textarea",key:"text",label:"Texte",default:"MASQUE",rows:2},
+  {type:"seg",key:"font",label:"Police",default:"archivo",options:[{v:"anton",label:"Anton"},{v:"bebas",label:"Bebas"},{v:"archivo",label:"Archivo"},{v:"syne",label:"Syne"},{v:"grotesk",label:"Grotesk"},{v:"mono",label:"Mono"}]},
+  {type:"upload",key:"fontFile",label:"↑ Importer une police (.ttf, .otf, .woff, .woff2)",accept:".ttf,.otf,.woff,.woff2,font/ttf,font/otf,font/woff,font/woff2",multiple:true},
+  {type:"range",key:"size",label:"Taille",min:40,max:700,step:1,default:280},
+  {type:"range",key:"tracking",label:"Interlettrage",min:-40,max:100,step:1,default:0},
+  {type:"toggle",key:"bold",label:"Gras",default:true},
+  {g:"Bandes"},
+  {type:"range",key:"count",label:"Nombre",min:1,max:40,step:1,default:6},
+  {type:"range",key:"duty",label:"Remplissage",min:.05,max:.95,step:.01,default:.5},
+  {type:"range",key:"phase",label:"Décalage",min:0,max:1,step:.01,default:0},
+  {type:"range",key:"speed",label:"Défilement",min:-2,max:2,step:.01,default:0},
+  {g:"Fond"},
+  {type:"toggle",key:"transp",label:"Fond transparent",default:false},
+  {type:"color",key:"paper",label:"Couleur du fond",default:"#0a0a0b"}],
+  initState(){return{};},
+  // The layer paints a coverage map: white where the picture below stays. The
+  // stage then keeps only that coverage (or cuts it, inverted) — see drawLayers.
+  // Position, scale and rotation of the mask come from the Motion group.
+  render(c,W,H,t,p,st){
+    c.clearRect(0,0,W,H);
+    const m=st._m||(st._m=newCanvas(1,1));if(m.width!==W||m.height!==H){m.width=W;m.height=H;}
+    const mc=m.getContext("2d");mc.setTransform(1,0,0,1,0,0);mc.clearRect(0,0,W,H);mc.fillStyle="#fff";
+    const cx=W/2,cy=H/2,ang=(p.angle||0)*Math.PI/180,D=Math.hypot(W,H);
+    if(p.kind==="grad"){
+      const soft=Math.max(.002,p.gsoft/100),pos=p.gpos/100;let g;
+      if(p.gmode==="radial"){const r=Math.max(W,H)*.75*pos;g=mc.createRadialGradient(cx,cy,Math.max(0,r*(1-soft)),cx,cy,Math.max(1,r*(1+soft)));}
+      else{const dx=Math.cos(ang),dy=Math.sin(ang),L=Math.abs(dx)*W+Math.abs(dy)*H,a=(pos-.5)*L,x0=cx+dx*(a-soft*L/2),y0=cy+dy*(a-soft*L/2),x1=cx+dx*(a+soft*L/2),y1=cy+dy*(a+soft*L/2);g=mc.createLinearGradient(x0,y0,x1,y1);}
+      g.addColorStop(0,"rgba(255,255,255,1)");g.addColorStop(1,"rgba(255,255,255,0)");mc.fillStyle=g;mc.fillRect(0,0,W,H);
+    }else if(p.kind==="shape"){
+      const w=W*p.w/100,h=H*p.h/100;mc.save();mc.translate(cx,cy);mc.rotate(ang);mc.beginPath();
+      if(p.shape==="rect"){roundPath(mc,-w/2,-h/2,w,h,Math.min(w,h)/2*p.round);}
+      else if(p.shape==="ellipse"){mc.ellipse(0,0,w/2,h/2,0,0,Math.PI*2);}
+      else{const n=Math.max(3,p.sides|0),star=p.shape==="star",k=star?n*2:n,inner=.25+.7*p.round;
+        for(let i=0;i<k;i++){const a=i/k*Math.PI*2-Math.PI/2,r=star&&(i%2)?inner:1,x=Math.cos(a)*w/2*r,y=Math.sin(a)*h/2*r;if(i)mc.lineTo(x,y);else mc.moveTo(x,y);}mc.closePath();}
+      mc.fill();mc.restore();
+    }else if(p.kind==="text"){
+      const size=p.size*RSCALE,lines=(p.text||"").split("\n"),lh=size*1.02;
+      mc.save();mc.translate(cx,cy);mc.rotate(ang);mc.font=TOOLS.type.fontStr(p,size);mc.textAlign="center";mc.textBaseline="middle";
+      if("letterSpacing" in mc)mc.letterSpacing=(p.tracking*RSCALE)+"px";
+      lines.forEach((ln,i)=>mc.fillText(ln,0,(i-(lines.length-1)/2)*lh));mc.restore();
+    }else{
+      const n=Math.max(1,p.count|0),per=D/n,ph=((p.phase+t*.001*p.speed)%1+1)%1;
+      mc.save();mc.translate(cx,cy);mc.rotate(ang);
+      for(let i=-1;i<=n;i++)mc.fillRect(-D/2+(i+ph)*per,-D/2,per*p.duty,D);
+      mc.restore();
+    }
+    c.save();
+    if(p.invert)c.globalAlpha=p.amount;                                   // cut only as hard as asked
+    else if(p.amount<1){c.fillStyle="rgba(255,255,255,"+(1-p.amount)+")";c.fillRect(0,0,W,H);}   // keep a share everywhere
+    if(p.feather>0){try{c.filter="blur("+(p.feather*RSCALE).toFixed(1)+"px)";}catch(e){}}
+    c.drawImage(m,0,0);c.filter="none";c.restore();
+  },
+  randomize(p){p.kind=pick(["shape","shape","grad","text","stripes"]);p.shape=pick(["rect","ellipse","poly","star"]);p.w=Math.round(rand(30,90));p.h=Math.round(rand(30,90));p.round=+rand(0,1).toFixed(2);p.sides=Math.round(rand(3,8));
+    p.angle=Math.round(rand(0,360));p.feather=Math.random()<.5?Math.round(rand(0,120)):0;p.invert=Math.random()<.25;p.gmode=pick(["linear","radial"]);p.gpos=Math.round(rand(30,70));p.gsoft=Math.round(rand(10,70));
+    p.count=Math.round(rand(2,14));p.duty=+rand(.2,.7).toFixed(2);p.font=pick(["anton","archivo","bebas","syne"]);p.size=Math.round(rand(180,420));}
+},
 micro:{name:"Micrographe",accent:"#cfe6f2",usesBelow:true,schema:[
   {g:"Source"},
   {type:"upload",key:"img",label:"\u2191 Importer image / vidéo (sinon calques dessous)",accept:"image/*,video/*"},
@@ -3341,7 +3418,7 @@ post:{name:"Post FX",accent:"#ffd166",usesBelow:true,schema:[
   randomize(p){p.bloom=+rand(.35,1.4).toFixed(2);p.radius=Math.round(rand(24,90));p.thresh=+rand(.4,.7).toFixed(2);p.ca=+rand(.2,1.2).toFixed(2);p.vig=+rand(.3,.9).toFixed(2);p.grain=+rand(.08,.4).toFixed(2);}
 }
 };
-const ORDER=["bg","field","smoke","image","video","deck","type","lyrics","shape","swarm","particles","flare","spectrum","process","micro","post","camera"];
+const ORDER=["bg","field","smoke","image","video","deck","type","lyrics","shape","swarm","particles","flare","spectrum","process","mask","micro","post","camera"];
 
 const PRESETS=[
   {name:"Chrome Orbit",layers:[
@@ -3437,7 +3514,21 @@ const PRESETS=[
     {t:"bg",p:{mode:"solid",a:"#06060a"}},
     {t:"smoke",b:"screen",p:{mode:"energy",c1:"#03030d",c2:"#5b6bff",speed:.5,scale:1.4}},
     {t:"spectrum",b:"screen",p:{shape:"circle",bands:96,cmode:"rainbow",rad:16,h:50,gap:.35,glow:.6}},
-    {t:"flare",b:"screen",p:{pos:"center",intensity:.3,size:.8,ghosts:2}}]}
+    {t:"flare",b:"screen",p:{pos:"center",intensity:.3,size:.8,ghosts:2}}]},
+  {name:"Cut Out",layers:[
+    {t:"field",p:{mode:"plasma",c1:"#ff6a4d",c2:"#5b6bff",scale:1.3,speed:1.2}},
+    {t:"smoke",b:"screen",p:{mode:"energy",c1:"#03030d",c2:"#d8ff3b",speed:.8,scale:1.2}},
+    {t:"mask",p:{kind:"text",text:"CUT\nOUT",font:"archivo",size:300,tracking:-6,paper:"#0a0a0b"}},
+    {t:"post",p:{bloom:.7,radius:50,thresh:.6,ca:.4,vig:.5,grain:.18}}]},
+  {name:"Keyhole",layers:[
+    {t:"bg",p:{mode:"mesh",a:"#05050f",b:"#3d1a5b",c:"#ff2d6b",scale:1.3,speed:.8}},
+    {t:"swarm",b:"screen",p:{mode:"orbit",count:22,size:110,radius:18}},
+    {t:"mask",p:{kind:"shape",shape:"ellipse",w:34,h:62,feather:40,paper:"#07070a"},mfx:{audio:.6}},
+    {t:"type",b:"screen",p:{text:"PEEK",font:"bebas",size:130,tracking:14,ink:"#ffffff",mode:"still"}}]},
+  {name:"Blinds",layers:[
+    {t:"field",p:{mode:"flow",c1:"#d8ff3b",c2:"#3de1ff",speed:1.3,density:1.2}},
+    {t:"type",p:{text:"OPEN",font:"archivo",size:220,tracking:-8,ink:"#ffffff",material:"metal",bevel:9,rough:.12,depth:6}},
+    {t:"mask",p:{kind:"stripes",count:9,duty:.55,angle:90,speed:.12,feather:6,paper:"#0a0a0b"}}]}
 ];
 const INTROS=[
   {name:"Impact",layers:[
@@ -3653,7 +3744,7 @@ function paintBackdrop(){
    space. Moves ride smooth noise and springs, never linear ramps, and the kick
    answers the music with a bounce instead of a jolt. Screen-space layers (image
    effects, the grade, the HUD) stay put: they belong to the lens, not the world. */
-const DEPTH={bg:.12,field:.18,smoke:.3,image:.32,video:.32,deck:.3,type:.85,lyrics:.72,shape:.8,swarm:.6,particles:.7,flare:.5,spectrum:.55,process:0,micro:0,post:0,camera:0};
+const DEPTH={bg:.12,field:.18,smoke:.3,image:.32,video:.32,deck:.3,type:.85,lyrics:.72,shape:.8,swarm:.6,particles:.7,flare:.5,spectrum:.55,process:0,mask:0,micro:0,post:0,camera:0};
 const COVER={bg:1,field:1,smoke:1,image:1,video:1,deck:1};
 const CAM_NAME={drift:"Dérive",push:"Avant",pull:"Arrière",orbit:"Orbite",hand:"Main",crane:"Grue",still:"Fixe"};
 const TR_NAME={whip:"Fouet",zoom:"Zoom traversant",spin:"Rotation",glitch:"Coupe glitch",dip:"Fondu au noir",flash:"Flash"};
@@ -3763,8 +3854,9 @@ function drawLayers(tm){
       CURLAYER=null;
       if(m.freeze){if(!L._fz)L._fz=newCanvas(1,1);if(L._fz.width!==W||L._fz.height!==H){L._fz.width=W;L._fz.height=H;}const fc=L._fz.getContext("2d");fc.clearRect(0,0,W,H);fc.drawImage(buf,0,0);L._fzDone=true;drawFrom=L._fz;}
       else{L._fzDone=false;drawFrom=buf;}}
-    ctx.globalCompositeOperation=L.blend;
-    let al=clamp(L.opacity,0,1),tx=0,ty=0,sc=1,rot=0,ink=1;
+    const isMask=L.type==="mask";
+    ctx.globalCompositeOperation=isMask?(L.params.invert?"destination-out":"destination-in"):L.blend;
+    let al=isMask?1:clamp(L.opacity,0,1),tx=0,ty=0,sc=1,rot=0,ink=1;
     if(m.mode&&m.mode!=="off"&&!THUMB){const ph=introPhase(L,lt),e=easeOut(clamp(ph,0,1));
       if(m.mode==="zoom"){sc=lerp(2.6,1,e);al*=clamp(e*1.5,0,1);}
       else if(m.mode==="rise"){ty=lerp(H*.14,0,e);al*=e;}
@@ -3784,10 +3876,12 @@ function drawLayers(tm){
         if((COVER[L.type]||L.jamBase)&&pre>=.999){const cr=Math.abs(Math.cos(rot)),sr=Math.abs(Math.sin(rot)),ar=Math.max(W/H,H/W);
           const need=cr+sr*ar+2*Math.max(Math.abs(tx)/W,Math.abs(ty)/H)+.003;if(sc<need)sc=need;}}}
     ctx.globalAlpha=al;const moved=(tx||ty||sc!==1||rot);
-    if(m.mode==="ink"){ctx.save();if(ink<1){ctx.beginPath();for(let k=0;k<9;k++){const bx=hash2(k+1,3)*W,by=hash2(k+2,7)*H,r=ink*Math.max(W,H)*.62*(.5+hash2(k+3,9));ctx.moveTo(bx+r,by);ctx.arc(bx,by,r,0,7);}ctx.clip();}if(moved){ctx.translate(W/2+tx,H/2+ty);ctx.rotate(rot);ctx.scale(sc,sc);ctx.translate(-W/2,-H/2);}ctx.drawImage(drawFrom,0,0);ctx.restore();}
-    else if(m.blur&&moved){const P=L._pt||{tx,ty,sc,rot},steps=5;for(let s=0;s<steps;s++){const k=s/(steps-1),itx=lerp(P.tx,tx,k),ity=lerp(P.ty,ty,k),isc=lerp(P.sc,sc,k),ir=lerp(P.rot,rot,k);ctx.save();ctx.globalAlpha=al/steps*1.35;ctx.translate(W/2+itx,H/2+ity);ctx.rotate(ir);ctx.scale(isc,isc);ctx.translate(-W/2,-H/2);ctx.drawImage(drawFrom,0,0);ctx.restore();}L._pt={tx,ty,sc,rot};}
+    if(m.mode==="ink"&&!isMask){ctx.save();if(ink<1){ctx.beginPath();for(let k=0;k<9;k++){const bx=hash2(k+1,3)*W,by=hash2(k+2,7)*H,r=ink*Math.max(W,H)*.62*(.5+hash2(k+3,9));ctx.moveTo(bx+r,by);ctx.arc(bx,by,r,0,7);}ctx.clip();}if(moved){ctx.translate(W/2+tx,H/2+ty);ctx.rotate(rot);ctx.scale(sc,sc);ctx.translate(-W/2,-H/2);}ctx.drawImage(drawFrom,0,0);ctx.restore();}
+    else if(m.blur&&moved&&!isMask){const P=L._pt||{tx,ty,sc,rot},steps=5;for(let s=0;s<steps;s++){const k=s/(steps-1),itx=lerp(P.tx,tx,k),ity=lerp(P.ty,ty,k),isc=lerp(P.sc,sc,k),ir=lerp(P.rot,rot,k);ctx.save();ctx.globalAlpha=al/steps*1.35;ctx.translate(W/2+itx,H/2+ity);ctx.rotate(ir);ctx.scale(isc,isc);ctx.translate(-W/2,-H/2);ctx.drawImage(drawFrom,0,0);ctx.restore();}L._pt={tx,ty,sc,rot};}
     else if(moved){ctx.save();ctx.translate(W/2+tx,H/2+ty);ctx.rotate(rot);ctx.scale(sc,sc);ctx.translate(-W/2,-H/2);ctx.drawImage(drawFrom,0,0);ctx.restore();L._pt={tx,ty,sc,rot};}
     else{ctx.drawImage(drawFrom,0,0);L._pt={tx,ty,sc,rot};}
+    // what the mask removed shows the fill colour, unless the picture is to stay transparent
+    if(isMask&&!L.params.transp){ctx.globalCompositeOperation="destination-over";ctx.globalAlpha=1;ctx.fillStyle=L.params.paper||"#0a0a0b";ctx.fillRect(0,0,W,H);}
   }
   ctx.globalCompositeOperation="source-over";ctx.globalAlpha=1;
   if(!trDone)transPass();
@@ -4962,7 +5056,8 @@ const JAM_LOOKS=[
   {id:"particles",label:"Particules",extra:i=>({t:"particles",b:"screen",p:{mode:"swirl",count:2600,srccol:false,col:"#d8ff3b",spread:1.2,psize:2.5},mfx:{audio:1*i}})},
   {id:"smoke",label:"Fumée",extra:i=>({t:"smoke",b:"screen",p:{mode:"energy",speed:.75,scale:1.3,detail:2},mfx:{audio:.6*i}})},
   {id:"flares",label:"Halos",extra:i=>({t:"flare",b:"screen",p:{pos:"orbit",intensity:.45,size:1.1,streak:1.6,ghosts:4},mfx:{audio:1.25*i}})},
-  {id:"spectrum",label:"Spectre",extra:i=>({t:"spectrum",b:"screen",p:{shape:"bars",bands:48,anchor:"bottom",cmode:"gradient",c1:"#3dff8a",c2:"#3de1ff",glow:.4,w:90,h:35,gain:+(1+.3*i).toFixed(2)},mfx:{audio:.15*i}})}
+  {id:"spectrum",label:"Spectre",extra:i=>({t:"spectrum",b:"screen",p:{shape:"bars",bands:48,anchor:"bottom",cmode:"gradient",c1:"#3dff8a",c2:"#3de1ff",glow:.4,w:90,h:35,gain:+(1+.3*i).toFixed(2)},mfx:{audio:.15*i}})},
+  {id:"mask",label:"Fenêtre",fx:()=>({t:"mask",p:{kind:"shape",shape:"ellipse",w:72,h:78,feather:110,amount:.9}})}
 ];
 const jamEl=document.getElementById("jam"),jamGo=document.getElementById("jamGo");
 function openJam(){jamEl.classList.add("open");jamRefresh();}
@@ -5004,7 +5099,7 @@ function jamRefresh(){
 // w: how much a look fills the frame; c: what it costs to render (profiled)
 const LOOK_W={glitch:{w:2,c:.6},neon:{w:2,c:3},kaleido:{w:2.2,c:1.3},sort:{w:2,c:1},liquid:{w:2,c:.5},micro:{w:1.8,c:1},
   vhs:{w:1.1,c:.9},retro:{w:1.2,c:1.1},rgb:{w:1,c:.5},thermal:{w:2,c:1.6},
-  particles:{w:1,c:1.2},smoke:{w:1.5,c:2.2},flares:{w:.8,c:.6},spectrum:{w:1.1,c:.3}};
+  particles:{w:1,c:1.2},smoke:{w:1.5,c:2.2},flares:{w:.8,c:.6},spectrum:{w:1.1,c:.3},mask:{w:1,c:.3}};
 // pairs that fight: smoke's fog erases line art, two textures on top turn to mud
 const LOOK_CLASH={"neon|smoke":0,"thermal|smoke":.25,"liquid|smoke":.3,"micro|particles":.4,"vhs|smoke":.6,"sort|particles":.6,"kaleido|smoke":.5};
 function lookClash(a,b){const x=LOOK_CLASH[a+"|"+b],y=LOOK_CLASH[b+"|"+a];return x!=null?x:(y!=null?y:1);}
@@ -5586,13 +5681,13 @@ document.getElementById("jamScript").onclick=saveJamScript;
    grid is a magnet, not a rule. Your edits sit over the plan and survive every
    re-roll; editing never regenerates the parts of the song you did not touch. */
 const LOOK_COL={glitch:"#ff2d6b",neon:"#3dffd0",kaleido:"#ffb03d",sort:"#b36bff",liquid:"#3db4ff",micro:"#e8f4fa",
-  thermal:"#ff7a3d",vhs:"#fff05c",retro:"#9dff5c",rgb:"#ff5ea8",particles:"#ff9ad5",smoke:"#9aa0ff",flares:"#fff3b0",spectrum:"#3dff8a"};
+  thermal:"#ff7a3d",vhs:"#fff05c",retro:"#9dff5c",rgb:"#ff5ea8",particles:"#ff9ad5",smoke:"#9aa0ff",flares:"#fff3b0",spectrum:"#3dff8a",mask:"#e0c3ff"};
 const TL_COL={intro:"#6b7688",verse:"#3de1ff",build:"#ffc53d",drop:"#ff3d7a",breakdown:"#a58bff",outro:"#6b7688",song:"#8a8aff"};
 const dockEl=document.getElementById("dock"),dkTracks=document.getElementById("dkTracks");
 let DRAG=null,_dkNow=-1,_dkHeads=[],_dkDrew=0;
 
 const LOOK_SHORT={glitch:"GLT",neon:"NEO",kaleido:"KAL",sort:"SRT",liquid:"LIQ",micro:"MIC",thermal:"THR",vhs:"VHS",retro:"RET",rgb:"RGB",
-  particles:"PTC",smoke:"SMK",flares:"FLR",spectrum:"SPC"};
+  particles:"PTC",smoke:"SMK",flares:"FLR",spectrum:"SPC",mask:"MSK"};
 // the label that fits: the full name, a three-letter code, or just the colour
 function lookFit(id,px){const full=lookLabel(id);if(px>=full.length*6.4+22)return full;
   if(px>=34)return LOOK_SHORT[id]||full.slice(0,3).toUpperCase();return "";}
@@ -5778,7 +5873,7 @@ function addLookLayer(id,quiet){
 // any effect layer can be scheduled; once it is, the timeline decides when it shows
 function ensureLayerLook(L){
   if(!dockSchedulable(L)){toast(layerTitle(L)+" joue sur tout le morceau — impossible de le placer");return null;}
-  if(!L.look){L.look="u"+L.uid;L.lookKind=TOOLS[L.type].usesBelow?"fx":"extra";L.name=layerTitle(L);
+  if(!L.look){L.look="u"+L.uid;L.lookKind=(TOOLS[L.type].usesBelow||TOOLS[L.type].masks)?"fx":"extra";L.name=layerTitle(L);
     toast(L.name+" suit désormais la timeline");}
   return L.look;
 }
@@ -5825,7 +5920,7 @@ document.getElementById("dkZoomTxt").onclick=()=>{DKZ=1;dockLayout();dkScroll.sc
 /* ---- editing: drops from the palette, and blocks you move, trim and cut ---- */
 function dkLaneOf(d){
   if(d.kind==="clip")return"clip";
-  if(d.kind==="layer"){const L=d.layer;if(L.look)return L.lookKind==="fx"?"fx":"ex";return TOOLS[L.type]&&TOOLS[L.type].usesBelow?"fx":"ex";}
+  if(d.kind==="layer"){const L=d.layer;if(L.look)return L.lookKind==="fx"?"fx":"ex";return TOOLS[L.type]&&(TOOLS[L.type].usesBelow||TOOLS[L.type].masks)?"fx":"ex";}
   return lookKindOf(d.id)==="fx"?"fx":"ex";
 }
 function dkDragLabel(d){
