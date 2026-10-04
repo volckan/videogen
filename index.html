@@ -529,9 +529,11 @@ body.preview .panel{display:none}
     <button class="act" id="save"><span>↓ PNG</span><select id="expRes" title="taille du PNG, grand côté : 1K 1920 · 2K 2560 · 4K 3840 px"><option value="1920">1K</option><option value="2560">2K</option><option value="3840" selected>4K</option></select></button>
     <span class="act" title="format du cadre — verrouille le rapport d'export"><span>▭</span><select id="aspectSel" aria-label="Format du cadre"><option value="1.77778" selected>16:9</option><option value="0">Libre</option><option value="0.5625">9:16</option><option value="1">1:1</option><option value="0.8">4:5</option><option value="1.33333">4:3</option><option value="2.33333">21:9</option></select></span>
     <button class="act" id="music" title="musique de fond (mp3) — pilote la pulsation audio-réactive et est incluse dans les enregistrements"><span id="musicTxt">♪ Musique</span></button>
+    <button class="act" id="arrBtn" title="afficher la timeline d'arrangement du morceau chargé, sans réalisateur — ou replier / déplier celle de la jam (A)"><span>▤ Arrangement</span><span class="kbd">A</span></button>
     <button class="act" id="savePre" title="enregistrer cette composition dans un fichier" aria-label="Enregistrer la composition">⤓<span class="lbl">Enregistrer</span></button>
     <button class="act" id="loadPre" title="charger une composition enregistrée" aria-label="Charger une composition">⤒<span class="lbl">Charger</span></button>
     <button class="act" id="guideBtn" type="button" title="comment fonctionne VideoGen — guide et FAQ (H)" aria-label="Guide et FAQ">?</button>
+    <button class="act" id="resetBtn" type="button" title="réinitialiser : composition de départ, session enregistrée et préférences effacées" aria-label="Réinitialiser">⟲<span class="lbl">Réinitialiser</span></button>
     <input type="file" id="musicFile" accept=".mp3,.MP3,.wav,.WAV,.m4a,.M4A,.aac,.AAC,.ogg,.OGG,.oga,.flac,.FLAC,.opus,.weba" hidden>
     <input type="file" id="preFile" accept="application/json,.json" hidden>
   </div>
@@ -642,6 +644,7 @@ body.preview .panel{display:none}
     <div class="krow"><span>Enregistrer une vidéo</span><b>C</b></div>
     <div class="krow"><span>Aperçu plein écran</span><b>F</b></div>
     <div class="krow"><span>Lecture / pause (ou clic sur l'image)</span><b>Espace</b></div>
+    <div class="krow"><span>Afficher / replier l'arrangement</span><b>A</b></div>
     <div class="krow"><span>Guide et FAQ</span><b>H</b></div>
     <div class="krow"><span>Image-clé précédente / suivante</span><b>, .</b></div>
     <div class="krow"><span>Cette fiche</span><b>?</b></div>
@@ -731,7 +734,7 @@ body.preview .panel{display:none}
 
 <section id="g-layers">
   <h2><span class="n">03</span>Calques et fusion</h2>
-  <p>Une composition est une pile de dix calques au plus, peints du bas de la liste vers le haut. Chaque calque se dessine par-dessus ceux du dessous, selon son <b>mode de fusion</b> et son <b>opacité</b>.</p>
+  <p>Une composition est une pile de vingt calques au plus, peints du bas de la liste vers le haut. Chaque calque se dessine par-dessus ceux du dessous, selon son <b>mode de fusion</b> et son <b>opacité</b>.</p>
   <div class="gd-strip gd-steps">
     <figure class="gfig"><div class="gshot" data-shot="stack:0"></div><figcaption>Champ · plasma</figcaption></figure>
     <figure class="gfig"><div class="gshot" data-shot="stack:1"></div><figcaption>+ Texte · métal</figcaption></figure>
@@ -921,6 +924,7 @@ body.preview .panel{display:none}
 
 <section id="g-arr">
   <h2><span class="n">10</span>La timeline d'arrangement</h2>
+  <p>La timeline s'ouvre de deux façons. <b>▤ Arrangement</b> <kbd>A</kbd> l'affiche pour le morceau chargé avec <b>♪ Musique</b>, sans réalisateur : une seule section, et seulement vos blocs, images-clés et clips — un montage entièrement à la main. Une <b>Jam Session</b> l'ouvre avec le montage du réalisateur, que vous retouchez ensuite.</p>
   <p>Pendant une jam, la timeline s'installe sous la scène : les sections du morceau en haut, puis une piste par calque — même ordre et mêmes noms que la liste des calques. C'est un vrai éditeur : chaque bloc, du réalisateur ou de vous, peut être déplacé, rogné, copié, coupé ou retiré à n'importe quel moment du morceau. La grille rythmique est un aimant, pas une règle.</p>
   <svg class="gd-svg" viewBox="0 0 800 250" role="img" aria-label="La timeline d'arrangement">
     <rect class="sv-bg" width="800" height="250"/>
@@ -1160,6 +1164,7 @@ body.preview .panel{display:none}
     <tr><td><kbd>S</kbd></td><td>Exporter un PNG</td></tr>
     <tr><td><kbd>C</kbd></td><td>Enregistrer / rendre une vidéo</td></tr>
     <tr><td><kbd>F</kbd></td><td>Aperçu plein écran</td></tr>
+    <tr><td><kbd>A</kbd></td><td>Afficher la timeline d'arrangement du morceau chargé (ou la replier / déplier)</td></tr>
     <tr><td><kbd>H</kbd></td><td>Ce guide</td></tr>
     <tr><td><kbd>?</kbd></td><td>Fiche des raccourcis</td></tr>
     <tr><td><kbd>Ctrl Z</kbd> · <kbd>Ctrl Maj Z</kbd></td><td>Annuler · rétablir</td></tr>
@@ -3534,6 +3539,7 @@ const INTROS=[
     {t:"post",p:{bloom:.95,radius:70,thresh:.5,ca:1.0,vig:.6,grain:.2}}]}
 ];
 
+const MAX_LAYERS=20;   // the stack; parked looks may add a few more on top
 let layers=[];let sel=0;let W=1,H=1;let RSCALE=1,exporting=false;
 let buf=newCanvas(1,1),bufC=buf.getContext("2d");
 let snap=newCanvas(1,1),snapC=snap.getContext("2d");
@@ -3653,7 +3659,7 @@ const CAM_NAME={drift:"Dérive",push:"Avant",pull:"Arrière",orbit:"Orbite",hand
 const TR_NAME={whip:"Fouet",zoom:"Zoom traversant",spin:"Rotation",glitch:"Coupe glitch",dip:"Fondu au noir",flash:"Flash"};
 const TR_ICON={whip:"»",zoom:"◎",spin:"↻",glitch:"▚",dip:"▼",flash:"✦"};
 // section kinds are data keys; this is what the user reads
-const SEC_NAME={intro:"intro",verse:"couplet",build:"montée",drop:"drop",breakdown:"break",outro:"outro"};
+const SEC_NAME={intro:"intro",verse:"couplet",build:"montée",drop:"drop",breakdown:"break",outro:"outro",song:"morceau"};
 function secLabel(s){const k=s.kind||s,m=/(\d+)$/.exec(s.name||"");return(SEC_NAME[k]||k)+(m?" "+m[1]:"");}
 function layerDepth(L){if(L.mfx&&L.mfx.depth!=null)return L.mfx.depth;if(L.jamBase)return .2;return DEPTH[L.type]!=null?DEPTH[L.type]:.5;}
 const CAM={on:false,x:0,y:0,z:0,roll:0,k:{x:0,v:0},last:0,T:null,
@@ -3913,7 +3919,7 @@ function renderLayerList(noDock){
     el.querySelector(".up").onclick=e=>{e.stopPropagation();if(i<layers.length-1){[layers[i],layers[i+1]]=[layers[i+1],layers[i]];if(sel===i)sel=i+1;else if(sel===i+1)sel=i;renderLayerList();renderControls();}};
     el.querySelector(".dn").onclick=e=>{e.stopPropagation();if(i>0){[layers[i],layers[i-1]]=[layers[i-1],layers[i]];if(sel===i)sel=i-1;else if(sel===i-1)sel=i;renderLayerList();renderControls();}};
     el.querySelector(".dup").onclick=e=>{e.stopPropagation();
-      if(layers.length>=10){toast("10 calques maximum");return;}
+      if(layers.length>=MAX_LAYERS){toast(MAX_LAYERS+" calques maximum");return;}
       pushHistory();const srcL=layers[i];
       const cp=makeLayer(srcL.type,{p:JSON.parse(JSON.stringify(srcL.params)),b:srcL.blend,o:srcL.opacity,mfx:JSON.parse(JSON.stringify(srcL.mfx))});
       cp.visible=srcL.visible;
@@ -3933,7 +3939,7 @@ addBtn.onclick=e=>{e.stopPropagation();addMenu.classList.toggle("open");};
 addMenu.onclick=e=>{const t=e.target.dataset.t;if(!t)return;
   if(t==="camera"){const ci=layers.findIndex(x=>x.type==="camera");
     if(ci>=0){sel=ci;addMenu.classList.remove("open");renderLayerList();renderControls();toast("une seule caméra par scène — la voici");return;}}
-  if(layers.length>=10){toast("10 calques maximum");addMenu.classList.remove("open");return;}
+  if(layers.length>=MAX_LAYERS){toast(MAX_LAYERS+" calques maximum");addMenu.classList.remove("open");return;}
   pushHistory();
   let at;
   if(t==="bg")at=0;                                   // grounds go behind everything
@@ -4398,9 +4404,47 @@ musicBtn.onclick=()=>{if(AUDIO.el)togglePlay();else musicFile.click();};
 musicBtn.oncontextmenu=e=>{e.preventDefault();musicFile.click();};
 musicFile.onchange=()=>{
   const f=musicFile.files&&musicFile.files[0];if(!f)return;
-  if(AUDIO.load(f)){musicBtn.classList.add("on");musicTxt.textContent="♪ Lecture";toast("musique activée — montez la Pulsation audio d'un calque");}
+  if(AUDIO.load(f)){musicBtn.classList.add("on");musicTxt.textContent="♪ Lecture";toast("musique activée — montez la Pulsation audio d'un calque");
+    if(SCRIPT.data&&SCRIPT.data.free){freeRefresh();freeWatch();}   // the free timeline follows the new track
+  }
   else toast("audio non pris en charge ici");
   musicFile.value="";
+};
+/* ---- the arrangement without a jam: the song's timeline, your blocks only ----
+   One section for the whole track, no director events: looks play where you
+   draw or drop them, keyframes and clips work as in a jam. */
+function freeScript(){
+  const an=AUDIO.analysis&&AUDIO._anFile&&AUDIO.analysis.duration?AUDIO.analysis:null;
+  const dur=an?an.duration:(AUDIO.el&&isFinite(AUDIO.el.duration)&&AUDIO.el.duration>1?AUDIO.el.duration:60);
+  const bpm=an?+an.bpm.toFixed(1):(AUDIO.bpm||120);
+  return{v:2,kind:"videogen.free.timeline",free:true,seed:1,ts:Date.now(),
+    track:{name:AUDIO.name||"",duration:+dur.toFixed(2),bpm:bpm,analysed:!!an,structure:"free"},
+    grid:an?{t0:+an.t0.toFixed(3),period:+an.period.toFixed(4),downbeat:an.down}:null,
+    media:[],lyrics:null,pool:[],airtime:{},intensity:1,fade:{in:0,out:0},
+    sections:[{i:0,name:"song",kind:"song",at:0,len:+dur.toFixed(3),bar:0,bars:Math.max(1,Math.round(dur*bpm/240)),energy:.5,events:[],ramps:[],cam:null,tr:null}]};
+}
+function freeRefresh(){if(!SCRIPT.data||!SCRIPT.data.free)return;SCRIPT.set(freeScript());SCRIPT.on=false;timelineRender();renderLayerList();}
+function freeWatch(){const el=AUDIO.el;if(!el||el._freeMeta)return;el._freeMeta=true;
+  const on=()=>freeRefresh();el.addEventListener("loadedmetadata",on);el.addEventListener("durationchange",on);
+  if(AUDIO.analysisP)AUDIO.analysisP.then(()=>{if(AUDIO.el===el)freeRefresh();});}
+function openArrangement(){
+  if(!AUDIO.el){toast("chargez d'abord un morceau — ♪ Musique ou une Jam Session");musicFile.click();return;}
+  if(SCRIPT.data){   // already there (a jam, or the free timeline): fold or unfold it
+    const folded=dockEl.classList.contains("fold");dockEl.dataset.userFold=folded?"open":"fold";dockFit();requestAnimationFrame(dockWave);return;}
+  SCRIPT.set(freeScript());SCRIPT.on=false;freeWatch();
+  dockEl.dataset.userFold="open";timelineRender();renderLayerList();
+  toast("arrangement libre — glissez des looks, tracez des blocs ; le réalisateur est désactivé");
+}
+document.getElementById("arrBtn").onclick=openArrangement;
+// start over: the saved session, the media it holds and the preferences go; the page reloads on the first preset
+document.getElementById("resetBtn").onclick=async()=>{
+  if(!confirm("Réinitialiser VideoGen ?\n\nLa composition en cours, la session enregistrée (avec ses fichiers et polices) et les préférences seront effacées. Les fichiers que vous avez téléchargés ne sont pas concernés."))return;
+  AUTOSAVE.on=false;
+  try{if(AUDIO.el)AUDIO.el.pause();}catch(e){}
+  try{Object.keys(localStorage).filter(k=>k.indexOf("videogen")===0).forEach(k=>localStorage.removeItem(k));}catch(e){}
+  try{if(DB.db){DB.db.close();DB.db=null;}
+    await new Promise(res=>{const r=indexedDB.deleteDatabase(DB.name);r.onsuccess=r.onerror=r.onblocked=()=>res();setTimeout(res,3000);});}catch(e){}
+  location.reload();
 };
 
 /* ---------------- render: frame-exact video, up to 4K ----------------
@@ -5376,7 +5420,7 @@ function buildJamStack(pool,rng,must){
   // the base, the lyrics and the grade are never negotiable; looks share what
   // is left of the ten layers, and all of them start parked
   const hasLyrics=!!(JAM.cues&&JAM.cues.length);
-  const slots=10-out.length-(hasLyrics?1:0)-2;   // the grade and the camera
+  const slots=MAX_LAYERS-out.length-(hasLyrics?1:0)-2;   // the grade and the camera
   // looks the user pinned always make it; the rest share what is left
   const mustIn=(must||[]).filter(id=>lookMeta(id)&&(pool||[]).indexOf(id)>=0);
   const rest=(pool||[]).filter(id=>mustIn.indexOf(id)<0);
@@ -5451,7 +5495,7 @@ function startJam(opts){
     // A re-roll recuts the song on the same stack: its order, your styling and
     // every layer you touched stay put; only looks nobody claimed rotate.
     pushHistory();
-    const fixed=layers.filter(L=>!L.look).length,slots=Math.max(0,10-fixed);
+    const fixed=layers.filter(L=>!L.look).length,slots=Math.max(0,MAX_LAYERS-fixed);
     const rest=pool.filter(id=>must.indexOf(id)<0);
     const mEx=must.filter(id=>lookMeta(id)&&lookMeta(id).extra).length;
     const nEx=rest.filter(id=>{const m=lookMeta(id);return m&&m.extra;}).length;
@@ -5543,7 +5587,7 @@ document.getElementById("jamScript").onclick=saveJamScript;
    re-roll; editing never regenerates the parts of the song you did not touch. */
 const LOOK_COL={glitch:"#ff2d6b",neon:"#3dffd0",kaleido:"#ffb03d",sort:"#b36bff",liquid:"#3db4ff",micro:"#e8f4fa",
   thermal:"#ff7a3d",vhs:"#fff05c",retro:"#9dff5c",rgb:"#ff5ea8",particles:"#ff9ad5",smoke:"#9aa0ff",flares:"#fff3b0",spectrum:"#3dff8a"};
-const TL_COL={intro:"#6b7688",verse:"#3de1ff",build:"#ffc53d",drop:"#ff3d7a",breakdown:"#a58bff",outro:"#6b7688"};
+const TL_COL={intro:"#6b7688",verse:"#3de1ff",build:"#ffc53d",drop:"#ff3d7a",breakdown:"#a58bff",outro:"#6b7688",song:"#8a8aff"};
 const dockEl=document.getElementById("dock"),dkTracks=document.getElementById("dkTracks");
 let DRAG=null,_dkNow=-1,_dkHeads=[],_dkDrew=0;
 
@@ -5722,7 +5766,7 @@ function addLookLayer(id,quiet){
   if(layers.some(L=>L.look===id))return true;
   // parked looks cost nothing (hidden layers are skipped), so the stack can hold every
   // look while the director still shows one treatment and two accents at a time
-  if(layers.length>=16){if(!quiet)toast("la pile est pleine — supprimez d'abord un calque");return false;}
+  if(layers.length>=MAX_LAYERS+6){if(!quiet)toast("la pile est pleine — supprimez d'abord un calque");return false;}
   const sp=m.fx?m.fx():m.extra(JAM.intensity);
   const L=makeLayer(sp.t,sp);L.look=id;L.lookKind=m.fx?"fx":"extra";L.name=m.label;L.visible=false;
   if(!quiet)pushHistory();
@@ -6136,6 +6180,7 @@ function dockPalette(){
 window.addEventListener("resize",()=>document.querySelectorAll(".dk-sw").forEach(w=>{if(w._edge)w._edge();}));
 function dockWave(){
   const sc=SCRIPT.data,cv2=document.getElementById("dkWave");if(!sc||!cv2)return;
+  if(sc.free){cv2.width=cv2.width;return;}   // no energy curve without the analysis-driven cut
   const w=Math.max(10,cv2.clientWidth),h=Math.max(10,cv2.clientHeight),dpr=Math.min(2,window.devicePixelRatio||1);
   cv2.width=Math.min(32000,Math.round(w*dpr));cv2.height=Math.round(h*dpr);
   const c=cv2.getContext("2d"),sx=cv2.width/w;c.setTransform(sx,0,0,dpr,0,0);c.clearRect(0,0,w,h);
@@ -6203,11 +6248,13 @@ function dockRender(){
   _dkHeads=dkHeads();_dkNow=-1;
   const pins=TL.items.length;
   const stat=document.getElementById("dkStat");
-  stat.textContent=(sc.track.analysed?(sc.track.structure==="flat"?"morceau régulier · arc modèle":"arrangé sur le morceau"):"arc modèle · analyse…")+
+  stat.textContent=(sc.free?"arrangement libre":(sc.track.analysed?(sc.track.structure==="flat"?"morceau régulier · arc modèle":"arrangé sur le morceau"):"arc modèle · analyse…"))+
     "  ·  "+Math.round(sc.track.bpm)+" bpm"+(pins?"  ·  "+pins+" retouche"+(pins>1?"s":""):"");
   stat.title="graine "+sc.seed.toString(36)+" — la même graine et les mêmes retouches reproduisent ce montage";
   document.getElementById("dkHint").style.display=pins?"none":"";
   const dir=document.getElementById("dkDir");dir.textContent="Réalisateur · "+(SCRIPT.on?"activé":"désactivé");dir.classList.toggle("on",SCRIPT.on);
+  dir.disabled=!!sc.free;dir.title=sc.free?"pas de réalisateur hors d'une jam : lancez une Jam Session pour qu'il monte le morceau":"le réalisateur pilote le mixage — désactivez-le pour prendre les commandes";
+  document.getElementById("dkRoll").disabled=!!sc.free;
   document.getElementById("dkUndo").disabled=!TL.hist.length;document.getElementById("dkRedo").disabled=!TL.fut.length;
   const anyKf=layers.some(L=>L.kf&&Object.keys(L.kf).length);document.getElementById("dkPrevKf").disabled=!anyKf;document.getElementById("dkNextKf").disabled=!anyKf;
   dockPalette();
@@ -6224,8 +6271,8 @@ function dockRender(){
     d.style.background="linear-gradient(180deg,"+col+"38,"+col+"10)";d.style.borderTopColor=col;d.dataset.i=sec.i;
     dkEl("span","",d).textContent=secLabel(sec);
     d.title=secLabel(sec)+"  "+fmtT(sec.at)+"–"+fmtT(sec.at+sec.len)+"  ·  énergie "+Math.round(sec.energy*100)+"%  —  cliquez pour y aller, ↻ pour un nouveau montage de cette section";
-    const rr=dkEl("button","rr",d);rr.type="button";rr.textContent="↻";rr.title="nouveau montage pour cette section ("+secLabel(sec)+") seulement — vos retouches restent";
-    rr.onclick=ev=>{ev.stopPropagation();jamRerollSection(sec.i);};
+    if(!sc.free){const rr=dkEl("button","rr",d);rr.type="button";rr.textContent="↻";rr.title="nouveau montage pour cette section ("+secLabel(sec)+") seulement — vos retouches restent";
+      rr.onclick=ev=>{ev.stopPropagation();jamRerollSection(sec.i);};}
   });
   const grid=document.getElementById("dkGrid");grid.innerHTML="";
   // phrase lines, stronger where a section starts: a guide for the eye, not a rule
@@ -6469,6 +6516,7 @@ window.addEventListener("keydown",e=>{
   else if(e.key==="c"||e.key==="C")recBtn.click();
   else if(e.key==="f"||e.key==="F")document.getElementById("expand").click();
   else if(e.key==="h"||e.key==="H")openGuide();
+  else if(e.key==="a"||e.key==="A")openArrangement();
   else if(e.key==="Escape"&&document.body.classList.contains("preview"))document.getElementById("expand").click();
 });
 
@@ -6519,7 +6567,7 @@ async function autosaveTick(){
       await DB.set("media",{music:music,jamMedia:jamMedia,media:media,partial:partial,fonts:FONTS.map(f=>({id:f.id,name:f.name,blob:f.blob}))});
       AUTOSAVE.lastMediaSig=msig;
     }
-    const jam={active:!!SCRIPT.data,hadMusic:!!JAM.music,cues:JAM.cues||null,seed:JAM.seed||null,looks:JAM.looks,poolKept:JAM.poolKept||null,intensity:JAM.intensity,pins:JAM.pins||{},lyricLock:JAM.lyricLock||null,on:SCRIPT.on};
+    const jam={active:!!(SCRIPT.data&&!SCRIPT.data.free),free:!!(SCRIPT.data&&SCRIPT.data.free),hadMusic:!!JAM.music,cues:JAM.cues||null,seed:JAM.seed||null,looks:JAM.looks,poolKept:JAM.poolKept||null,intensity:JAM.intensity,pins:JAM.pins||{},lyricLock:JAM.lyricLock||null,on:SCRIPT.on};
     await DB.set("session",{v:1,ts:Date.now(),comp:serializeComp(),tl:TL.items,jam:jam,sel:sel,aspect:aspectSel.value});
     AUTOSAVE.lastSig=sig;
   }catch(e){}
@@ -6557,6 +6605,7 @@ async function sessionRestore(){
   if(track&&AUDIO.load(track)){
     musicBtn.classList.add("on");musicTxt.textContent="♪ Lecture";
     if(jam.active&&JAM.music){JAM.seed=jam.seed||1;JAM.bump={};jamDirect();SCRIPT.on=jam.on!==false;jamWatchAnalysis();jamWatchMeta();}
+    else if(jam.free){SCRIPT.set(freeScript());SCRIPT.on=false;freeWatch();dockEl.dataset.userFold="open";timelineRender();}
   }
   fit();renderLayerList();renderControls();stageFlash();
   toast(med.partial?"session reprise — certains médias trop volumineux n'ont pas été conservés, rechargez-les":"session reprise");
