@@ -48,6 +48,13 @@ header{flex:0 0 auto;display:flex;align-items:center;justify-content:space-betwe
 .cat{flex:0 0 auto;font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;padding:6px 15px;border:1px solid var(--line-2);color:var(--ink-dim);transition:.15s;white-space:nowrap}
 .cat:hover{color:var(--ink);border-color:var(--accent)}
 .cat.on{background:var(--accent);color:#000;border-color:var(--accent)}
+.cats .sp{flex:1}
+.cats .cact{flex:0 0 auto;font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:6px 10px;border:1px solid transparent;color:var(--ink-faint);white-space:nowrap;transition:.15s}
+.cats .cact:hover{color:var(--ink);border-color:var(--line-2)}
+.pcard .px{position:absolute;right:3px;top:3px;z-index:2;font-family:var(--mono);font-size:9px;line-height:1;color:#08080a;background:rgba(255,255,255,.85);border-radius:2px;padding:2px 4px;opacity:0;transition:opacity .12s}
+.pcard:hover .px{opacity:1}
+.pcard .px:hover{background:#fff}
+.pempty{flex:0 0 auto;height:66px;display:flex;align-items:center;padding:0 16px;border:1px dashed var(--line-2);font-family:var(--mono);font-size:10px;letter-spacing:.06em;color:var(--ink-faint);white-space:nowrap}
 .cprow{display:flex;gap:6px}
 .cprow button{flex:1;margin:0}
 .cprow button:disabled{opacity:.35;cursor:default}
@@ -177,6 +184,11 @@ body.preview .dock{display:none!important}
 .dk-hdr .dk-lab{z-index:9}
 .lr .dk-trk{height:calc(18px*var(--dk-rs))}
 .lr.deck .dk-trk{height:calc(26px*var(--dk-rs))}
+.lr.scn .dk-trk{height:calc(22px*var(--dk-rs));background:rgba(255,255,255,.025);border-bottom:1px solid var(--line)}
+.lr.scn .dk-lab{color:var(--ink-dim)}
+.bk.scn{opacity:.95;color:#08080a}
+.bk.scn.live{box-shadow:0 0 0 1.5px #fff,0 0 10px rgba(255,255,255,.35)}
+.lr.scn .ctr{background:#fff;top:50%;margin-top:-7px}
 .lr.lyr .dk-trk{height:calc(14px*var(--dk-rs))}
 .lr.flat .dk-trk{height:calc(14px*var(--dk-rs))}
 .dock.fold .dk-pal,.dock.fold #dkRows,.dock.fold .dk-grid{display:none}
@@ -196,9 +208,9 @@ body.preview .dock{display:none!important}
 .bk:active{cursor:grabbing}
 .bk.now{opacity:1;box-shadow:0 0 0 1.5px #fff,0 0 14px var(--glow,rgba(255,255,255,.4))}
 .bk .nm{overflow:hidden;text-overflow:ellipsis;min-width:0}
-.bk .x,.bk .u,.bk .sc{flex:0 0 auto;font-family:var(--mono);font-size:9px;line-height:1;color:#08080a;background:rgba(255,255,255,.85);border-radius:2px;padding:1px 3px;opacity:0;transition:opacity .12s;cursor:pointer;border:0}
+.bk .x,.bk .u,.bk .sc,.bk .tr{flex:0 0 auto;font-family:var(--mono);font-size:9px;line-height:1;color:#08080a;background:rgba(255,255,255,.85);border-radius:2px;padding:1px 3px;opacity:0;transition:opacity .12s;cursor:pointer;border:0}
 .bk .x{margin-left:auto}
-.bk:hover .x,.bk:hover .u,.bk:hover .sc{opacity:1}
+.bk:hover .x,.bk:hover .u,.bk:hover .sc,.bk:hover .tr{opacity:1}
 .bar{position:absolute;left:0;right:0;top:50%;height:3px;margin-top:-1.5px;border-radius:2px;background:rgba(255,255,255,.14)}
 .lr.deck .bar{background:linear-gradient(90deg,rgba(255,94,168,.35),rgba(255,94,168,.18))}
 .lr.flat .bar{opacity:.4}
@@ -246,9 +258,10 @@ body.preview .panel{display:none}
 .gallery::-webkit-scrollbar{height:5px}
 .gallery::-webkit-scrollbar-thumb{background:var(--line-2);border-radius:3px}
 .gallery::-webkit-scrollbar-track{background:transparent}
-.pcard{flex:0 0 auto;position:relative;width:118px;height:66px;border:1px solid var(--line-2);background:var(--surface-2);overflow:hidden;transition:.18s;padding:0;display:block}
+.pcard{flex:0 0 auto;position:relative;width:118px;height:66px;cursor:pointer;user-select:none;border:1px solid var(--line-2);background:var(--surface-2);overflow:hidden;transition:.18s;padding:0;display:block}
 .pcard img{position:absolute;inset:0;width:100%;height:100%;display:block;opacity:0;transition:opacity .35s}
 .pcard img.in{opacity:1}
+.pcard img,.pcard .pw,.pcard .pn{pointer-events:none}   /* the card itself takes clicks and starts drags */
 .pcard .pn{position:absolute;left:0;right:0;bottom:0;padding:11px 7px 5px;font-family:var(--mono);font-size:9px;letter-spacing:.07em;text-transform:uppercase;color:#fff;text-align:left;background:linear-gradient(to top,rgba(0,0,0,.88),rgba(0,0,0,0));white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pcard .pw{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:9px;color:var(--ink-faint);letter-spacing:.1em}
 .pcard:hover,.pcard:focus-visible{border-color:var(--accent);transform:translateY(-2px)}
@@ -326,6 +339,7 @@ body.preview .panel{display:none}
 /* palette strips: no scrollbar eating the thumbnails; wheel, arrows and edge fades instead */
 .dk-pg{display:flex;align-items:center;gap:8px;height:100%;min-width:0;overflow:visible}
 .dk-pg.clips{flex:0 1 auto;max-width:42%;padding-right:12px;margin-right:12px;border-right:1px solid var(--line)}
+.dk-pg.scenes{flex:0 0 auto;padding-right:12px;margin-right:12px;border-right:1px solid var(--line)}
 .dk-pg.looks{flex:1 1 0}
 .dk-sw{position:relative;flex:1 1 auto;min-width:0;height:100%;display:flex;align-items:center}
 .dk-sc{display:flex;align-items:center;gap:6px;height:100%;min-width:0;width:100%;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;padding:0 2px;scroll-behavior:auto}
@@ -536,6 +550,7 @@ body.preview .panel{display:none}
     <button class="act" id="resetBtn" type="button" title="réinitialiser : composition de départ, session enregistrée et préférences effacées" aria-label="Réinitialiser">⟲<span class="lbl">Réinitialiser</span></button>
     <input type="file" id="musicFile" accept=".mp3,.MP3,.wav,.WAV,.m4a,.M4A,.aac,.AAC,.ogg,.OGG,.oga,.flac,.FLAC,.opus,.weba" hidden>
     <input type="file" id="preFile" accept="application/json,.json" hidden>
+    <input type="file" id="presetsFile" accept="application/json,.json" multiple hidden>
   </div>
 </header>
 
@@ -875,6 +890,8 @@ body.preview .panel{display:none}
 <section id="g-ideas">
   <h2><span class="n">07</span>Presets, aléatoire et variations</h2>
   <ul><li><b>Galerie</b> : 20 Intros (ouvertures avec titre) et 28 Scènes. Touchez pour charger.</li><li><b>⚄ Aléatoire</b> <kbd>G</kbd> construit une composition entièrement nouvelle.</li><li><b>≈ Varier</b> <kbd>V</kbd> décale un peu chaque réglage — la même idée, une autre prise.</li><li><b>◇ Mélanger</b> <kbd>R</kbd> retire les réglages de chaque calque et garde la pile.</li><li><b>↶ ↷</b> annulent et rétablissent n'importe quoi <kbd>Ctrl Z</kbd> <kbd>Ctrl Maj Z</kbd>.</li><li><b>⤓ Enregistrer</b> écrit la composition dans un fichier .json et <b>⤒ Charger</b> la ramène. Vos fichiers multimédias n'y sont pas inclus : gardez-les à côté.</li></ul>
+  <h3>Mes presets</h3>
+  <p>Dans la barre des catégories, <b>＋ Preset</b> enregistre la composition en cours comme preset nommé, avec sa vignette, dans la catégorie <b>Mes presets</b> — à côté des Intros et des Scènes, et conservé dans ce navigateur avec la session. Au survol d'une carte, <b>✕</b> la supprime. <b>⤓ Exporter</b> écrit tous vos presets dans un fichier .json (vignettes et polices comprises) et <b>⤒ Importer</b> les ajoute depuis un tel fichier, ou depuis une composition enregistrée avec ⤓ Enregistrer : de quoi partager une bibliothèque d'équipe. Les fichiers multimédias ne sont pas dans les presets.</p>
   <button class="gd-go" type="button" data-go="random">Essayer ⚄ Aléatoire</button>
 </section>
 
@@ -975,6 +992,9 @@ body.preview .panel{display:none}
     <li><b>Ajouter ou couper des blocs</b> : sur toute piste de look, tracer sur une plage vide crée un nouveau bloc, même quand la piste n'en a plus aucun. Au survol d'un bloc, <b>✂</b> le coupe en deux (à la tête de lecture si elle est dedans, sinon au milieu) ; <kbd>B</kbd> coupe le bloc sélectionné à la tête de lecture, qui reste sélectionné quand vous cliquez sur les pistes pour déplacer la tête (<kbd>Échap</kbd> désélectionne).</li>
     <li><b>Naviguer</b> : <b>▶</b> dans l'en-tête (ou <kbd>Espace</kbd>) lance et arrête la lecture ; cliquez sur les pistes pour sauter sans changer l'état de lecture ; pressez et glissez le long de la règle pour parcourir le morceau — la lecture se met en pause pendant que vous déplacez la tête ; <b>|◆</b> et <b>◆|</b> (touches <kbd>,</kbd> et <kbd>.</kbd>) sautent à l'image-clé précédente ou suivante ; <kbd>Ctrl</kbd> + molette pour zoomer autour du pointeur. Glissez le bord supérieur de la timeline pour l'agrandir : les pistes grandissent avec elle ; <b>▾</b> la replie.</li>
   </ul>
+  <h3>Scènes : enchaîner des compositions</h3>
+  <p>La première piste de la timeline, <b>Scènes</b>, enchaîne des compositions entières, pas seulement des looks. Glissez une vignette de la galerie (Intros, Scènes ou Mes presets) sur cette piste : elle se pose en bloc de huit mesures, que vous déplacez et rognez comme les autres. Tracez une plage vide de la piste, ou glissez la pastille <b>◧ composition actuelle</b> de la palette, pour y poser la composition en cours. Pendant un bloc, c'est sa pile de calques qui est sur scène ; en dehors des blocs, la composition de base revient.</p>
+  <ul><li><b>Modifier une scène</b> : placez la tête de lecture dans son bloc — la liste des calques devient la sienne — et réglez-la comme n'importe quelle composition. Vos changements sont conservés dans le bloc quand la tête en sort. Chaque scène a ses propres looks, images-clés et pistes dans la timeline.</li><li><b>Transitions</b> : au survol d'un bloc, <b>⇄</b> choisit la transition d'entrée (fondu, fondu au noir, volet, zoom, glissement ou coupe) et un clic droit sa durée (½ s, 1 s, 2 s). La transition est rendue à partir des deux compositions, qui continuent d'animer pendant le passage ; le même passage ramène la composition de base à la fin du bloc. Un repère au début du bloc rappelle la transition choisie.</li><li><b>Chevauchement</b> : poser une scène sur une autre rogne celle du dessous, comme un clip. <b>✂</b> coupe un bloc en deux moitiés qui partagent la même scène.</li><li>Le tout est rendu à l'identique dans l'export, et conservé par la sauvegarde automatique et le script de la session.</li></ul>
   <div class="gd-tip"><b>Les calques en gris</b> dans la liste sont des looks qui attendent leur phrase : l'étiquette dit quand le réalisateur les fait entrer (<i>à 1:20</i>).</div>
 </section>
 
@@ -3665,7 +3685,8 @@ function disposeLayers(arr){
 }
 function introPhase(L,tm){const m=L.mfx,dur=Math.max(200,m.dur*1000);if(L._introStart==null)L._introStart=tm;if(m.loop){const period=dur+700;return((tm-L._introStart)%period)/dur;}return(tm-L._introStart)/dur;}
 
-function applyPreset(preset){pushHistory();disposeLayers(layers);layers=preset.layers.map(spec=>makeLayer(spec.t,spec));sel=layers.length-1;curPresetName=preset.name;markActiveCard();renderLayerList();renderControls();stageFlash();toast(preset.name);}
+function presetLayers(pr){return pr.user?buildFromSpecs(pr.layers):pr.layers.map(spec=>makeLayer(spec.t,spec));}
+function applyPreset(preset){const built=presetLayers(preset);if(!built.length){toast("preset vide");return;}pushHistory();disposeLayers(layers);layers=built;sel=layers.length-1;curPresetName=preset.name;markActiveCard();renderLayerList();renderControls();stageFlash();toast(preset.name);}
 
 let ASPECT=16/9;
 function fit(){
@@ -3831,8 +3852,7 @@ let CURLAYER=null;
 function drawLayers(tm){
   // AUDIO runs on its own clock (see startClock) so the analysis stays accurate
   // however slowly this loop happens to be running
-  if(!AUDIO._clock)AUDIO.update();else AUDIO.frameSync();
-  FRAME_NO++;
+  if(!SCN.outPass){if(!AUDIO._clock)AUDIO.update();else AUDIO.frameSync();FRAME_NO++;}
   ctx.clearRect(0,0,W,H);
   paintBackdrop();
   const camL=THUMB?null:layers.find(x=>x.type==="camera"&&x.visible)||null;
@@ -3885,7 +3905,68 @@ function drawLayers(tm){
   }
   ctx.globalCompositeOperation="source-over";ctx.globalAlpha=1;
   if(!trDone)transPass();
+  if(SCN.out&&!SCN.outPass&&!THUMB)sceneMix(tm);
 }
+/* ---- scenes: whole compositions chained on the timeline ----
+   A scene block holds a stack of its own. When the playhead enters it, the live
+   stack is written back to where it came from (the previous scene, or the base
+   composition) and the block's stack takes the stage, through a transition
+   rendered from both stacks. Everything else — looks, keyframes, clips — works
+   inside each scene as usual. */
+const SCN={cur:null,base:null,out:null,outPass:false,ocv:null};
+const SCENE_TR=[["fade","fondu"],["dip","noir"],["wipe","volet"],["zoom","zoom"],["slide","glissement"],["cut","coupe"]];
+const SCENE_ICON={fade:"◐",dip:"▼",wipe:"▸",zoom:"◎",slide:"»",cut:"|"};
+function sceneTrName(t){const m=SCENE_TR.filter(x=>x[0]===t)[0];return m?m[1]:t;}
+function sceneColor(name){let h=0;for(let i=0;i<name.length;i++)h=(h*31+name.charCodeAt(i))>>>0;return hslHex(h%360,70,62);}
+function sceneAt(now){let best=null;for(const it of TL.items){if(it.kind!=="scene"||now<it.t0||now>=it.t1)continue;if(!best||it.t0>best.t0)best=it;}return best;}
+// the live stack, written back into the scene it belongs to (or the base)
+function sceneSync(){if(!SCRIPT.data)return;const specs=serializeLayers(layers);if(SCN.cur){const it=TL.items.find(x=>x.id===SCN.cur);if(it)it.scene.layers=specs;}else SCN.base=specs;}
+function sceneApply(now){
+  if(THUMB||!SCRIPT.data)return;
+  const it=sceneAt(now),id=it?it.id:null;
+  if(id===SCN.cur)return;
+  const prev=SCN.cur?TL.items.find(x=>x.id===SCN.cur):null;
+  layers.forEach(rememberMedia);sceneSync();
+  const built=buildFromSpecs(it?it.scene.layers:(SCN.base||[]));
+  const outgoing=layers;
+  layers=built.length?built:[makeLayer("bg")];
+  // the transition into a scene is its own; out of the last one, the same again
+  const tr=Object.assign({type:"fade",len:1},(it?it.tr:(prev?prev.tr:null))||{}),cutT=it?it.t0:(prev?prev.t1:now);
+  const len=tr.type==="cut"?0:Math.max(.1,+tr.len||1);
+  if(SCN.out){disposeLayers(SCN.out.layers);SCN.out=null;}
+  if(AUDIO.playing()&&len>0&&Math.abs(now-cutT)<len*1.5+.05&&outgoing.length)SCN.out={layers:outgoing,t0:cutT,len:len,type:tr.type,cv:SCN.ocv||(SCN.ocv=newCanvas(1,1))};
+  else disposeLayers(outgoing);
+  SCN.cur=id;sel=clamp(sel,0,layers.length-1);
+  HIST.past.length=0;HIST.future.length=0;HIST.seqs.length=0;updateHist();   // history belongs to one stack
+  if(REND)VVID.adopt(renderVideos(),REND.fps);
+  curPresetName=it?it.scene.name:"";markActiveCard();
+  renderLayerList();renderControls();
+}
+// the outgoing stack drawn for this frame on its own canvas, then laid over the
+// new one by the transition: fade, dip to black, wipe, zoom, slide
+function sceneMix(tm){
+  const o=SCN.out,now=AUDIO.now(),u=clamp((now-o.t0)/o.len,0,1);
+  if(u>=1||!AUDIO.el){disposeLayers(o.layers);SCN.out=null;return;}
+  const oc=o.cv;if(oc.width!==W||oc.height!==H){oc.width=W;oc.height=H;}
+  const oCv=cv,oCtx=ctx,oLayers=layers,oSel=sel;
+  SCN.outPass=true;cv=oc;ctx=oc.getContext("2d");layers=o.layers;sel=-1;
+  try{drawLayers(tm);}catch(e){}
+  SCN.outPass=false;cv=oCv;ctx=oCtx;layers=oLayers;sel=oSel;
+  const e=u*u*(3-2*u);
+  ctx.save();ctx.setTransform(1,0,0,1,0,0);ctx.globalCompositeOperation="source-over";
+  if(o.type==="dip"){if(u<.5){ctx.globalAlpha=1;ctx.drawImage(oc,0,0);ctx.globalAlpha=u*2;ctx.fillStyle="#000";ctx.fillRect(0,0,W,H);}else{ctx.globalAlpha=(1-u)*2;ctx.fillStyle="#000";ctx.fillRect(0,0,W,H);}}
+  else if(o.type==="wipe"){const x=W*e;ctx.beginPath();ctx.rect(x,0,W-x+1,H);ctx.clip();ctx.drawImage(oc,0,0);}
+  else if(o.type==="slide"){ctx.drawImage(oc,-W*e,0);}
+  else if(o.type==="zoom"){ctx.globalAlpha=1-e;const sc=1+e*.6;ctx.translate(W/2,H/2);ctx.scale(sc,sc);ctx.translate(-W/2,-H/2);ctx.drawImage(oc,0,0);}
+  else{ctx.globalAlpha=1-e;ctx.drawImage(oc,0,0);}
+  ctx.restore();
+}
+function sceneFromCurrent(){
+  const n=TL.items.filter(x=>x.kind==="scene").length+1;
+  return{name:curPresetName||("Scène "+n),layers:JSON.parse(JSON.stringify(serializeLayers(layers)))};
+}
+function sceneItem(scene,t0,t1){return{id:tlId(),kind:"scene",t0:t0,t1:t1,scene:scene,tr:{type:"fade",len:1}};}
+function presetSpecs(pr){if(pr.user)return JSON.parse(JSON.stringify(pr.layers));const tmp=pr.layers.map(spec=>makeLayer(spec.t,spec)),out=serializeLayers(tmp);disposeLayers(tmp);return out;}
 let lastTm=0,_bpmT=0,_prevTm=0,_kfT=0;
 const perfEl=document.getElementById("perf"),perfTxt=document.getElementById("perfTxt");
 perfEl.onclick=()=>{
@@ -4316,7 +4397,12 @@ function doUpload(L,s,files,btn){
 
 const galleryEl=document.getElementById("gallery"),catsBar=document.getElementById("cats"),flashEl=document.getElementById("flash");
 PRESETS.forEach(p=>{if(!p.cat)p.cat="Scènes";});INTROS.forEach(p=>p.cat="Intros");
-const ALLPRESETS=INTROS.concat(PRESETS),CATS=["Intros","Scènes"];
+/* ---- your own presets: the composition as a named card with its thumbnail, kept
+   in IndexedDB beside the session, imported and exported as JSON to share ---- */
+const USER_CAT="Mes presets",USER_PRESETS=[];
+const ALLPRESETS=[],CATS=["Intros","Scènes",USER_CAT];
+function refreshPresets(){ALLPRESETS.length=0;[].concat(INTROS,PRESETS,USER_PRESETS).forEach(p=>ALLPRESETS.push(p));}
+refreshPresets();
 let curCat="Intros",curPresetName="",CLIP=null;
 const TW=236,TH=132,thumbCache={},thumbImgs={},thumbQueue=[];
 function thumbKey(pr){return pr.cat+"|"+pr.name;}
@@ -4329,15 +4415,15 @@ function renderThumb(pr){
     cv=tcv;ctx=tcv.getContext("2d");
     buf.width=TW;buf.height=TH;snap.width=TW;snap.height=TH;
     W=TW;H=TH;RSCALE=TW/1280;
-    built=pr.layers.map(spec=>makeLayer(spec.t,spec));
+    built=presetLayers(pr);
     layers=built;sel=built.length-1;
     const t0=2400;
     for(let k=7;k>=0;k--)drawLayers(t0-k*45);
   }catch(e){}
   finally{
-    if(built)disposeLayers(built);
     cv=oCv;ctx=oCtx;layers=oLayers;sel=oSel;W=oW;H=oH;RSCALE=oRS;
     buf.width=obw;buf.height=obh;snap.width=osw;snap.height=osh;
+    if(built)disposeLayers(built);   // after the live stack is back, so its own media stay live
   }
   return tcv;
 }
@@ -4353,13 +4439,19 @@ function pumpThumbs(){
 function markActiveCard(){[].slice.call(galleryEl.children).forEach(function(b){b.classList.toggle("on",b.dataset.pn===curPresetName);});}
 function renderGallery(){
   galleryEl.innerHTML="";
-  ALLPRESETS.filter(p=>p.cat===curCat).forEach(pr=>{
+  const list=ALLPRESETS.filter(p=>p.cat===curCat);
+  if(!list.length&&curCat===USER_CAT){const e=document.createElement("div");e.className="pempty";e.textContent="aucun preset — ＋ Preset enregistre ici la composition en cours, avec sa vignette";galleryEl.appendChild(e);}
+  list.forEach(pr=>{
     const k=thumbKey(pr);
-    const b=document.createElement("button");
+    const b=document.createElement("div");
     b.className="pcard"+(pr.name===curPresetName?" on":"");
-    b.type="button";b.title=pr.name;b.dataset.pn=pr.name;b.setAttribute("aria-label","Appliquer le preset "+pr.name);
+    b.setAttribute("role","button");b.tabIndex=0;b.title=pr.name+" — cliquez pour charger · glissez sur la piste Scènes de la timeline pour l'enchaîner";b.dataset.pn=pr.name;b.setAttribute("aria-label","Appliquer le preset "+pr.name);
+    b.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();applyPreset(pr);}};
+    // a card drags onto the timeline's Scènes track
+    b.draggable=true;b.addEventListener("dragstart",e=>dockDragStart(e,{kind:"scene",preset:pr}));b.addEventListener("dragend",dockDragEnd);
+    if(pr.user){const x=document.createElement("span");x.className="px";x.textContent="✕";x.title="supprimer ce preset";x.onclick=e=>{e.stopPropagation();presetDelete(pr);};b.appendChild(x);}
     const w=document.createElement("span");w.className="pw";w.textContent="\u00b7\u00b7\u00b7";
-    const im=document.createElement("img");im.alt="";im.decoding="async";
+    const im=document.createElement("img");im.alt="";im.decoding="async";im.draggable=false;
     if(thumbCache[k]){im.src=thumbCache[k];im.classList.add("in");}
     thumbImgs[k]=im;
     const nm=document.createElement("span");nm.className="pn";nm.textContent=pr.name;
@@ -4370,7 +4462,64 @@ function renderGallery(){
   });
   galleryEl.scrollLeft=0;
 }
-function renderCats(){catsBar.innerHTML="";CATS.forEach(cn=>{const b=document.createElement("button");b.className="cat"+(cn===curCat?" on":"");b.type="button";b.textContent=cn;b.onclick=()=>{curCat=cn;renderCats();renderGallery();};catsBar.appendChild(b);});}
+function renderCats(){catsBar.innerHTML="";CATS.forEach(cn=>{const b=document.createElement("button");b.className="cat"+(cn===curCat?" on":"");b.type="button";b.textContent=cn;b.onclick=()=>{curCat=cn;renderCats();renderGallery();};catsBar.appendChild(b);});
+  const sp=document.createElement("span");sp.className="sp";catsBar.appendChild(sp);
+  const mk=(t,title,fn)=>{const b=document.createElement("button");b.className="cact";b.type="button";b.textContent=t;b.title=title;b.onclick=fn;catsBar.appendChild(b);};
+  mk("＋ Preset","enregistrer la composition en cours comme preset nommé, avec sa vignette",presetSave);
+  mk("⤒ Importer","importer des presets ou une composition (.json) dans Mes presets",()=>document.getElementById("presetsFile").click());
+  mk("⤓ Exporter","exporter tous vos presets en un fichier .json à partager",presetsExport);}
+function presetThumb(pr){let url="";THUMB=true;try{url=renderThumb(pr).toDataURL("image/jpeg",.85);}catch(e){}THUMB=false;return url;}
+function presetsStore(){return DB.set("presets",USER_PRESETS.map(p=>({name:p.name,layers:p.layers,thumb:p.thumb,fonts:p.fonts||[],ts:p.ts}))).catch(()=>{});}
+async function presetsLoad(){
+  let list=null;try{list=await DB.get("presets");}catch(e){}
+  if(!Array.isArray(list))return;USER_PRESETS.length=0;
+  for(const p of list){if(!p||!p.name||!Array.isArray(p.layers))continue;
+    USER_PRESETS.push({name:p.name,cat:USER_CAT,user:true,layers:p.layers,thumb:p.thumb||"",fonts:p.fonts||[],ts:p.ts||0});
+    if(p.thumb)thumbCache[USER_CAT+"|"+p.name]=p.thumb;
+    await fontsFromImport(p.fonts);}
+  refreshPresets();if(curCat===USER_CAT)renderGallery();
+}
+function presetUnique(name){let n=name,i=2;while(USER_PRESETS.some(p=>p.name===n))n=name+" ("+(i++)+")";return n;}
+async function presetAdd(name,specs,fonts,thumb,replace){
+  const pr={name:replace?name:presetUnique(name),cat:USER_CAT,user:true,layers:JSON.parse(JSON.stringify(specs)),fonts:fonts||[],ts:Date.now(),thumb:thumb||""};
+  if(!pr.thumb)pr.thumb=presetThumb(pr);
+  thumbCache[thumbKey(pr)]=pr.thumb;
+  const i=USER_PRESETS.findIndex(p=>p.name===pr.name);if(i>=0)USER_PRESETS[i]=pr;else USER_PRESETS.push(pr);
+  refreshPresets();return pr;
+}
+async function presetSave(){
+  if(!layers.length)return;
+  const name=(prompt("Nom du preset :",curPresetName&&!ALLPRESETS.some(p=>p.name===curPresetName&&!p.user)?curPresetName:"Mon preset")||"").trim();
+  if(!name)return;
+  const exists=USER_PRESETS.some(p=>p.name===name);
+  if(exists&&!confirm("Un preset « "+name+" » existe déjà. Le remplacer ?"))return;
+  const pr=await presetAdd(name,serializeLayers(layers),await fontsForExport(),"",exists);
+  curCat=USER_CAT;curPresetName=pr.name;renderCats();renderGallery();
+  await presetsStore();toast(exists?"preset « "+pr.name+" » remplacé":"preset « "+pr.name+" » enregistré");
+}
+async function presetDelete(pr){
+  if(!confirm("Supprimer le preset « "+pr.name+" » ?"))return;
+  const i=USER_PRESETS.indexOf(pr);if(i>=0)USER_PRESETS.splice(i,1);
+  delete thumbCache[thumbKey(pr)];refreshPresets();renderGallery();await presetsStore();toast("preset supprimé");
+}
+function presetsExport(){
+  if(!USER_PRESETS.length){toast("aucun preset à exporter");return;}
+  try{const blob=new Blob([JSON.stringify({app:"VideoGen",kind:"videogen.presets",v:1,ts:Date.now(),presets:USER_PRESETS.map(p=>({name:p.name,layers:p.layers,thumb:p.thumb,fonts:p.fonts||[]}))},null,1)],{type:"application/json"});
+    saveBlob(blob,"videogen-presets-"+Date.now()+".json");}
+  catch(e){toast("impossible d'exporter les presets");}
+}
+document.getElementById("presetsFile").onchange=async()=>{
+  const inp=document.getElementById("presetsFile"),files=[...(inp.files||[])];inp.value="";
+  let n=0;
+  for(const f of files){
+    try{const d=JSON.parse(await f.text());
+      const list=d&&d.kind==="videogen.presets"&&Array.isArray(d.presets)?d.presets:(d&&Array.isArray(d.layers)?[{name:f.name.replace(/\.[^.]+$/,""),layers:d.layers,fonts:d.fonts||[]}]:[]);
+      for(const p of list){if(!p||!Array.isArray(p.layers)||!p.layers.length)continue;await fontsFromImport(p.fonts);await presetAdd(String(p.name||"Preset").slice(0,60),p.layers,p.fonts||[],p.thumb||"",false);n++;}
+    }catch(e){}
+  }
+  if(!n){toast("aucun preset lisible dans ce fichier");return;}
+  curCat=USER_CAT;renderCats();renderGallery();await presetsStore();toast(n+" preset"+(n>1?"s":"")+" importé"+(n>1?"s":""));
+};
 renderCats();renderGallery();
 
 /* ---------- history ---------- */
@@ -4380,8 +4529,9 @@ let EDIT_SEQ=0;
 const HIST={past:[],future:[],limit:50,seqs:[]};
 function snapJSON(){try{return JSON.stringify(serializeComp());}catch(e){return null;}}
 function pushHistory(){if(!layers.length)return;const j=snapJSON();if(!j)return;HIST.past.push(j);HIST.seqs.push(++EDIT_SEQ);if(HIST.past.length>HIST.limit){HIST.past.shift();HIST.seqs.shift();}HIST.future.length=0;updateHist();}
-function buildFromSpecs(sp){return (sp||[]).filter(x=>x&&TOOLS[x.type]).map(x=>{const L=makeLayer(x.type,{p:x.params||{},b:x.blend,o:x.opacity,mfx:x.mfx||{},uid:x.uid});L.visible=x.visible!==false;if(x.look){L.look=x.look;L.lookKind=x.lookKind;
-  const lk=lookMeta(x.look);if(lk)L.name=lk.label;}if(x.userSet)L.userSet=JSON.parse(JSON.stringify(x.userSet));if(x.kf)L.kf=JSON.parse(JSON.stringify(x.kf));if(x.jamBase){L.jamBase=true;L._baseSpeed=x.baseSpeed||1;}if(x.userExp!=null)L._userExp=x.userExp;restoreMedia(L);return L;});}
+function buildFromSpecs(sp){const out=(sp||[]).filter(x=>x&&TOOLS[x.type]).map(x=>{const L=makeLayer(x.type,{p:x.params||{},b:x.blend,o:x.opacity,mfx:x.mfx||{},uid:x.uid});L.visible=x.visible!==false;if(x.look){L.look=x.look;L.lookKind=x.lookKind;
+  const lk=lookMeta(x.look);if(lk)L.name=lk.label;}if(x.userSet)L.userSet=JSON.parse(JSON.stringify(x.userSet));if(x.kf)L.kf=JSON.parse(JSON.stringify(x.kf));if(x.jamBase){L.jamBase=true;L._baseSpeed=x.baseSpeed||1;}if(x.userExp!=null)L._userExp=x.userExp;restoreMedia(L);return L;});
+  out.forEach(L=>{if(+L.uid>_uid)_uid=+L.uid;});return out;}
 function restoreJSON(j){try{const d=JSON.parse(j),built=buildFromSpecs(d.layers);if(!built.length)return false;disposeLayers(layers);layers=built;sel=clamp(sel,0,layers.length-1);renderLayerList();renderControls();return true;}catch(e){return false;}}
 function updateHist(){const u=document.getElementById("undo"),r=document.getElementById("redo");if(u)u.style.opacity=HIST.past.length?"1":".35";if(r)r.style.opacity=HIST.future.length?"1":".35";}
 function undo(){
@@ -4417,7 +4567,7 @@ document.getElementById("shuffle").onclick=()=>{if(!layers.length)return;pushHis
 document.getElementById("random").onclick=()=>{
   pushHistory();
   const blendPool=["screen","overlay","lighten","difference","hard-light","source-over","source-over"];
-  if(Math.random()<.4){const pr=pick(ALLPRESETS);disposeLayers(layers);layers=pr.layers.map(spec=>makeLayer(spec.t,spec));layers.forEach(L=>{const tool=TOOLS[L.type];if(tool.randomize)tool.randomize(L.params,L.state);});}
+  if(Math.random()<.4){const pr=pick(ALLPRESETS),built=presetLayers(pr);if(built.length){disposeLayers(layers);layers=built;}layers.forEach(L=>{const tool=TOOLS[L.type];if(tool.randomize)tool.randomize(L.params,L.state);});}
   else{const mids=["shape","swarm","field","type","process"];const n=2+Math.floor(Math.random()*3);const stack=[pick(["bg","field"])];for(let i=0;i<n-1;i++)stack.push(pick(mids));if(Math.random()<.6)stack[stack.length-1]=pick(["type","process"]);
     disposeLayers(layers);
     layers=stack.map((t,i)=>makeLayer(t,{b:i===0?"source-over":pick(blendPool),o:+(0.7+Math.random()*0.3).toFixed(2)}));
@@ -4446,7 +4596,8 @@ saveBtn.onclick=async()=>{
   catch(e){toast("échec de l'export");}
 };
 
-function serializeComp(){return{v:1,app:"VideoGen",ts:Date.now(),layers:layers.map(L=>({type:L.type,uid:L.uid,look:L.look,lookKind:L.lookKind,params:L.params,blend:L.blend,opacity:L.opacity,visible:L.visible,mfx:L.mfx,kf:L.kf&&Object.keys(L.kf).length?L.kf:undefined,userSet:L.userSet&&Object.keys(L.userSet).length?L.userSet:undefined,jamBase:L.jamBase||undefined,baseSpeed:L.jamBase?L._baseSpeed:undefined,userExp:L._userExp}))};}
+function serializeLayers(arr){return arr.map(L=>({type:L.type,uid:L.uid,look:L.look,lookKind:L.lookKind,params:L.params,blend:L.blend,opacity:L.opacity,visible:L.visible,mfx:L.mfx,kf:L.kf&&Object.keys(L.kf).length?L.kf:undefined,userSet:L.userSet&&Object.keys(L.userSet).length?L.userSet:undefined,jamBase:L.jamBase||undefined,baseSpeed:L.jamBase?L._baseSpeed:undefined,userExp:L._userExp}));}
+function serializeComp(){return{v:1,app:"VideoGen",ts:Date.now(),layers:serializeLayers(layers)};}
 document.getElementById("savePre").onclick=async()=>{
   try{const comp=serializeComp();comp.fonts=await fontsForExport();   // the brand's typefaces travel with the file
     const blob=new Blob([JSON.stringify(comp,null,1)],{type:"application/json"});saveBlob(blob,"videogen-composition-"+Date.now()+".json");}
@@ -4532,7 +4683,7 @@ function openArrangement(){
 document.getElementById("arrBtn").onclick=openArrangement;
 // start over: the saved session, the media it holds and the preferences go; the page reloads on the first preset
 document.getElementById("resetBtn").onclick=async()=>{
-  if(!confirm("Réinitialiser VideoGen ?\n\nLa composition en cours, la session enregistrée (avec ses fichiers et polices) et les préférences seront effacées. Les fichiers que vous avez téléchargés ne sont pas concernés."))return;
+  if(!confirm("Réinitialiser VideoGen ?\n\nLa composition en cours, la session enregistrée (avec ses fichiers et polices), vos presets (Mes presets — exportez-les d'abord si vous y tenez) et les préférences seront effacés. Les fichiers que vous avez téléchargés ne sont pas concernés."))return;
   AUTOSAVE.on=false;
   try{if(AUDIO.el)AUDIO.el.pause();}catch(e){}
   try{Object.keys(localStorage).filter(k=>k.indexOf("videogen")===0).forEach(k=>localStorage.removeItem(k));}catch(e){}
@@ -5437,6 +5588,7 @@ const SCRIPT={data:null,cur:-1,ev:-1,on:true,
     }
     // your timeline blocks, over the director's plan
     tlApply(now);
+    sceneApply(now);
   },
   apply(sec,ev,fresh){
     const e=sec.energy,now=clockMs();
@@ -5579,7 +5731,7 @@ function startJam(opts){
   }
   JAM.seed=(opts&&opts.seed!=null)?(opts.seed>>>0):((Math.random()*4294967295)>>>0);
   JAM.bump={};
-  if(!reroll){JAM.pins={};TL.items=[];TL.hist=[];TL.fut=[];TL.sel=null;}
+  if(!reroll){JAM.pins={};TL.items=[];TL.hist=[];TL.fut=[];TL.sel=null;SCN.cur=null;SCN.base=null;if(SCN.out){disposeLayers(SCN.out.layers);SCN.out=null;}}
   const rng=mulberry(JAM.seed);
   // pinned looks always make the cut, whatever the re-roll draws
   const must=[];TL.items.forEach(it=>{if(it.kind==="look"&&it.mode!=="off"&&lookMeta(it.look)&&must.indexOf(it.look)<0)must.push(it.look);});
@@ -5746,10 +5898,10 @@ function tlNormalize(activeId){
   TL.items.forEach(it=>{it.t0=clamp(it.t0,0,D);it.t1=clamp(it.t1,0,D);});
   let items=TL.items.filter(it=>it.t1-it.t0>=.05);
   const act=items.find(x=>x.id===activeId);
-  if(act&&act.kind==="clip"&&act.mode!=="off"){
+  if(act&&(act.kind==="clip"||act.kind==="scene")&&act.mode!=="off"){
     const out=[];
     items.forEach(it=>{
-      if(it===act||it.kind!=="clip"||it.mode==="off"||it.t1<=act.t0||it.t0>=act.t1){out.push(it);return;}
+      if(it===act||it.kind!==act.kind||it.mode==="off"||it.t1<=act.t0||it.t0>=act.t1){out.push(it);return;}
       if(it.t0<act.t0)out.push(Object.assign({},it,{id:it.t1>act.t1?tlId():it.id,t1:act.t0}));
       if(it.t1>act.t1)out.push(Object.assign({},it,{id:it.id,t0:act.t1,cin:(it.cin||0)+(act.t1-it.t0)}));
     });
@@ -5920,11 +6072,13 @@ document.getElementById("dkZoomTxt").onclick=()=>{DKZ=1;dockLayout();dkScroll.sc
 /* ---- editing: drops from the palette, and blocks you move, trim and cut ---- */
 function dkLaneOf(d){
   if(d.kind==="clip")return"clip";
+  if(d.kind==="scene")return"scene";
   if(d.kind==="layer"){const L=d.layer;if(L.look)return L.lookKind==="fx"?"fx":"ex";return TOOLS[L.type]&&(TOOLS[L.type].usesBelow||TOOLS[L.type].masks)?"fx":"ex";}
   return lookKindOf(d.id)==="fx"?"fx":"ex";
 }
 function dkDragLabel(d){
   if(d.kind==="clip")return"clip "+(d.clip+1);
+  if(d.kind==="scene")return"scène « "+d.preset.name+" »";
   if(d.kind==="layer")return layerTitle(d.layer);
   return lookLabel(d.id);
 }
@@ -5939,7 +6093,7 @@ function dockDragStart(e,d){
   if(!SCRIPT.data){e.preventDefault();return;}
   DRAG=d;
   try{e.dataTransfer.setData("text/plain","videogen");e.dataTransfer.effectAllowed="copy";}catch(err){}
-  const g=document.getElementById("dkGhost"),col=d.kind==="clip"?"#ffffff":lookColor(d.kind==="layer"?(d.layer.look||""):d.id);
+  const g=document.getElementById("dkGhost"),col=d.kind==="clip"?"#ffffff":(d.kind==="scene"?sceneColor(d.preset.name):lookColor(d.kind==="layer"?(d.layer.look||""):d.id));
   g.innerHTML='<i style="background:'+col+'"></i>'+dkDragLabel(d);
   try{e.dataTransfer.setDragImage(g,12,12);}catch(err){}
   dockEl.classList.add("dragging");dockEl.dataset.lane=dkLaneOf(d);
@@ -5974,7 +6128,7 @@ function dkHideDrop(){tlHideGuide();}
 function fmtTs(t){t=Math.max(0,t||0);const m=Math.floor(t/60),s=t-m*60;return m+":"+(s<10?"0":"")+s.toFixed(1);}
 // a palette drop: a new block starting where you let go, one to four bars long
 function tlDropSpan(d,t){
-  const bar=dkBarLen(),len=d.kind==="clip"?2*bar:4*bar,D=SCRIPT.data.track.duration;
+  const bar=dkBarLen(),len=d.kind==="clip"?2*bar:(d.kind==="scene"?8*bar:4*bar),D=SCRIPT.data.track.duration;
   let t0=tlSnapT(t,false).t;t0=clamp(t0,0,Math.max(0,D-.1));return{t0:t0,t1:Math.min(D,t0+len)};
 }
 dkScroll.addEventListener("dragover",e=>{
@@ -5982,10 +6136,10 @@ dkScroll.addEventListener("dragover",e=>{
   e.preventDefault();
   const r=dkTracks.getBoundingClientRect();if(e.clientX<r.left){dkHideDrop();return;}
   try{e.dataTransfer.dropEffect="copy";}catch(err){}
-  const sp=tlDropSpan(DRAG,tlTimeAt(e.clientX)),L=dkLayerOf(DRAG),row=dkRowOf(L);
+  const sp=tlDropSpan(DRAG,tlTimeAt(e.clientX)),L=dkLayerOf(DRAG),row=DRAG.kind==="scene"?dkContent.querySelector(".lr.scn"):dkRowOf(L);
   const box=document.getElementById("dkDrop"),top=row?row.offsetTop:52,h=row?row.offsetHeight:Math.max(20,dkContent.offsetHeight-52);
   box.style.display="block";box.style.left=dkPct(sp.t0)+"%";box.style.width=(dkPct(sp.t1)-dkPct(sp.t0))+"%";box.style.top=top+"px";box.style.height=h+"px";
-  tlShowGuide(sp.t0,dkDragLabel(DRAG)+"  "+fmtTs(sp.t0)+" – "+fmtTs(sp.t1)+(L?"":"  ·  rejoint la pile"),top);
+  tlShowGuide(sp.t0,dkDragLabel(DRAG)+"  "+fmtTs(sp.t0)+" – "+fmtTs(sp.t1)+((L||DRAG.kind==="scene")?"":"  ·  rejoint la pile"),top);
 });
 dkScroll.addEventListener("dragleave",e=>{if(!e.relatedTarget||!dkScroll.contains(e.relatedTarget))dkHideDrop();});
 dkScroll.addEventListener("drop",e=>{
@@ -5995,7 +6149,8 @@ dkScroll.addEventListener("drop",e=>{
   if(e.clientX<r.left)return;
   const sp=tlDropSpan(d,tlTimeAt(e.clientX));
   let it;
-  if(d.kind==="clip")it={id:tlId(),kind:"clip",clip:d.clip,t0:sp.t0,t1:sp.t1,cin:0};
+  if(d.kind==="scene")it=sceneItem({name:d.preset.name,layers:presetSpecs(d.preset)},sp.t0,sp.t1);
+  else if(d.kind==="clip")it={id:tlId(),kind:"clip",clip:d.clip,t0:sp.t0,t1:sp.t1,cin:0};
   else{let id=d.id;
     if(d.kind==="layer"){id=ensureLayerLook(d.layer);if(!id)return;}
     else if(!addLookLayer(id))return;
@@ -6011,6 +6166,11 @@ dkRows.addEventListener("mousemove",e=>{const b=e.target.closest(".bk");if(!b||!
   if(!b._btns){b._btns=true;const o=b._o;
     if(o.item&&o.item.from){const u=dkEl("button","u",b);u.type="button";u.textContent="↺";u.title="annuler votre retouche ici : le bloc du réalisateur revient";
       u.onclick=ev=>{ev.stopPropagation();tlRestore(o);};}
+    if(o.item&&o.item.kind==="scene"){const tb=dkEl("button","tr",b);tb.type="button";tb.textContent="⇄";
+      tb.title="transition d'entrée : "+sceneTrName((o.item.tr||{}).type||"fade")+" · "+((o.item.tr||{}).len||1)+" s — clic : suivante (fondu, noir, volet, zoom, glissement, coupe) · clic droit : durée ½ s, 1 s, 2 s";
+      tb.onclick=ev=>{ev.stopPropagation();tlSnapshot();const it=o.item,cur=(it.tr||{}).type||"fade",i=SCENE_TR.findIndex(x=>x[0]===cur),nx=SCENE_TR[(i+1)%SCENE_TR.length][0];
+        it.tr=Object.assign({type:"fade",len:1},it.tr,{type:nx});tlChanged("transition : "+sceneTrName(nx)+(nx==="cut"?"":" · "+it.tr.len+" s"));};
+      tb.oncontextmenu=ev=>{ev.preventDefault();ev.stopPropagation();tlSnapshot();const it=o.item;it.tr=Object.assign({type:"fade",len:1},it.tr);it.tr.len=it.tr.len>=2?.5:(it.tr.len>=1?2:1);tlChanged("transition « "+sceneTrName(it.tr.type)+" » : "+it.tr.len+" s");};}
     const sc=dkEl("button","sc",b);sc.type="button";sc.textContent="✂";sc.title="couper ce bloc en deux : à la tête de lecture si elle est dedans, sinon au milieu";
     sc.onclick=ev=>{ev.stopPropagation();const now=AUDIO.el?AUDIO.now():0;tlSplitAt(o,now>o.t0+.05&&now<o.t1-.05?now:(o.t0+o.t1)/2);};
     const x=dkEl("button","x",b);x.type="button";x.textContent="✕";x.title=o.item?"retirer ce bloc":(o.kind==="clip"?"le retirer (la plage reste vide)":"le retirer ici (cette plage reste nette)");
@@ -6066,7 +6226,7 @@ function tlPress(e,o,b){
 // Drawing on an always-on layer's track: press where the block should start and
 // drag to where it should end. The layer then follows the timeline and plays
 // only inside its blocks, like a look dropped from the palette.
-function tlDraw(e,L,row){
+function tlDraw(e,L,row,make){
   if(e.button!==0||!SCRIPT.data)return;
   e.preventDefault();e.stopPropagation();
   const D=SCRIPT.data.track.duration,top=row?row.offsetTop:52,h=row?row.offsetHeight:18,box=document.getElementById("dkDrop");
@@ -6075,17 +6235,19 @@ function tlDraw(e,L,row){
     bT=tlSnapT(tlTimeAt(ev.clientX),ev.shiftKey).t;
     const t0=Math.min(a,bT),t1=Math.max(a,bT);
     box.style.display="block";box.style.left=dkPct(t0)+"%";box.style.width=(dkPct(t1)-dkPct(t0))+"%";box.style.top=top+"px";box.style.height=h+"px";
-    tlShowGuide(bT,layerTitle(L)+"  "+fmtTs(t0)+" – "+fmtTs(t1),top);};
+    tlShowGuide(bT,(L?layerTitle(L):"scène")+"  "+fmtTs(t0)+" – "+fmtTs(t1),top);};
   const up=()=>{window.removeEventListener("pointermove",mv);window.removeEventListener("pointerup",up);window.removeEventListener("pointercancel",up);
     tlHideGuide();if(!moved)return;
     _dkDrew=performance.now();
     const t0=clamp(Math.min(a,bT),0,D),t1=clamp(Math.max(a,bT),0,D);if(t1-t0<.1)return;
-    const id=ensureLayerLook(L);if(!id)return;
-    tlSnapshot();const it={id:tlId(),kind:"look",look:id,mode:"on",t0:t0,t1:t1};TL.items.push(it);tlNormalize(it.id);TL.sel=it.id;
-    tlChanged(layerTitle(L)+" joue de "+fmtTs(t0)+" à "+fmtTs(t1)+" — tirez les bords pour ajuster, glissez pour déplacer");};
+    let it;
+    if(make)it=make(t0,t1);else{const id=ensureLayerLook(L);if(!id)return;it={id:tlId(),kind:"look",look:id,mode:"on",t0:t0,t1:t1};}
+    if(!it)return;
+    tlSnapshot();TL.items.push(it);tlNormalize(it.id);TL.sel=it.id;
+    tlChanged(tlName({item:it})+" joue de "+fmtTs(t0)+" à "+fmtTs(t1)+" — tirez les bords pour ajuster, glissez pour déplacer");};
   window.addEventListener("pointermove",mv);window.addEventListener("pointerup",up);window.addEventListener("pointercancel",up);
 }
-function tlName(o){const it=o.item||{},k=o.kind||it.kind;return k==="clip"?"clip "+((o.clip!=null?o.clip:it.clip)+1):lookLabel(o.look||it.look);}
+function tlName(o){const it=o.item||{},k=o.kind||it.kind;return k==="scene"?"scène « "+((it.scene||{}).name||"")+" »":(k==="clip"?"clip "+((o.clip!=null?o.clip:it.clip)+1):lookLabel(o.look||it.look));}
 // Taking a block off: yours is deleted; the director's goes quiet there (a clip
 // leaves an empty stretch you can fill or give back)
 function tlRemove(o,snapped){
@@ -6262,6 +6424,10 @@ function dockPalette(){
       im.title="clip "+(i+1)+(m.tagName==="VIDEO"?" · vidéo":"")+" — glissez sur une phrase pour l'y mettre en avant";
       dkDraggable(im,{kind:"clip",clip:i});});
   }
+  const ss=strip("scenes","Scènes",0);
+  const cc=dkEl("span","dk-chip",ss);cc.innerHTML='<i style="background:#fff"></i>◧ composition actuelle';
+  cc.title="glissez sur la piste Scènes : la composition en cours devient une scène à cet endroit — les vignettes de la galerie se glissent aussi";
+  cc.draggable=true;cc.addEventListener("dragstart",e=>{e.stopPropagation();dockDragStart(e,{kind:"scene",preset:{name:curPresetName||"Composition",user:true,layers:serializeLayers(layers)}});});cc.addEventListener("dragend",dockDragEnd);
   const ls=strip("looks","Looks",0);
   JAM_LOOKS.forEach(lk=>{
     const has=layers.some(L=>L.look===lk.id);
@@ -6335,6 +6501,20 @@ function dkLayerRow(rowsEl,L,i,TW){
   if(L.kf)for(const key in L.kf){const m=kfMeta(L,key);(L.kf[key]||[]).forEach(k=>{const d=dkEl("i","kfm",trk);d.style.left=dkPct(k.t)+"%";
     d.title="image-clé · "+(m?m.label:key)+" = "+(+k.v).toFixed(2)+" · "+fmtTs(k.t);});}
 }
+// the Scènes track: whole compositions in time, each a block with its transition
+function dkSceneRow(rowsEl,TW){
+  const row=dkEl("div","dk-row lr scn",rowsEl);row.dataset.uid="scenes";
+  const lab=dkEl("div","dk-lab",row),dot=dkEl("i","",lab);dot.style.background="#fff";dkEl("span","",lab).textContent="Scènes";
+  lab.title="compositions enchaînées — glissez une vignette de la galerie sur la piste, ou tracez une plage pour y poser la composition actuelle";
+  const trk=dkEl("div","dk-trk free",row);trk.title="tracez ici pour poser la composition actuelle comme scène ; une vignette de la galerie se dépose ici aussi";
+  TL.items.filter(x=>x.kind==="scene").forEach(it=>{
+    const tt=(it.tr||{}).type||"fade",col=sceneColor(it.scene.name);
+    tlBlockEl(trk,{cls:"usr scn"+(it.id===SCN.cur?" live":""),kind:"scene",item:it,t0:it.t0,t1:it.t1,color:col,label:px=>px>40?it.scene.name:"",
+      title:"scène « "+it.scene.name+" »  ·  "+fmtTs(it.t0)+" – "+fmtTs(it.t1)+"  ·  entrée : "+sceneTrName(tt)+(tt==="cut"?"":" "+((it.tr||{}).len||1)+" s")+"  —  glissez pour déplacer, tirez un bord pour rogner, ⇄ change la transition, ✂ coupe, ✕ retire ; placez la tête dedans pour modifier ses calques"},TW);
+    const m=dkEl("i","ctr",trk);m.style.left=dkPct(it.t0)+"%";m.textContent=SCENE_ICON[tt]||"◆";m.title="transition « "+sceneTrName(tt)+" » vers « "+it.scene.name+" »";
+  });
+  trk.addEventListener("pointerdown",e=>{if(e.target===trk)tlDraw(e,null,row,(t0,t1)=>sceneItem(sceneFromCurrent(),t0,t1));});
+}
 function dockRender(){
   const sc=SCRIPT.data;
   if(!sc){dockEl.classList.remove("on");return;}
@@ -6373,6 +6553,7 @@ function dockRender(){
   // phrase lines, stronger where a section starts: a guide for the eye, not a rule
   _dkHeads.forEach((h,hi)=>{if(hi>0){const gl=dkEl("i","gl"+(h.at===h.sec.at?" sb":""),grid);gl.style.left=dkPct(h.at)+"%";}});
   const rowsEl=document.getElementById("dkRows");rowsEl.innerHTML="";
+  dkSceneRow(rowsEl,TW);
   for(let i=layers.length-1;i>=0;i--)dkLayerRow(rowsEl,layers[i],i,TW);
   dockFit();
   requestAnimationFrame(dockWave);
@@ -6429,7 +6610,7 @@ const DK_ROW_H={look:18,deck:26,lyr:14,flat:14,cam:16},DK_HEAD_H=52,DK_MAX_H=196
 function dkRowCls(L){return L.look?"look":(L.type==="deck"?"deck":(L.type==="lyrics"?"lyr":(L.type==="camera"?"cam":"flat")));}
 function dockRowScale(){
   const max=parseInt(dkScroll.style.maxHeight)||DK_MAX_H;
-  let nat=0;layers.forEach(L=>{nat+=DK_ROW_H[dkRowCls(L)];});
+  let nat=22;layers.forEach(L=>{nat+=DK_ROW_H[dkRowCls(L)];});   // the Scènes row, then one per layer
   const rs=nat>0?clamp((max-DK_HEAD_H-6)/nat,1,3):1;
   dockEl.style.setProperty("--dk-rs",rs.toFixed(3));
 }
@@ -6663,7 +6844,8 @@ async function autosaveTick(){
       AUTOSAVE.lastMediaSig=msig;
     }
     const jam={active:!!(SCRIPT.data&&!SCRIPT.data.free),free:!!(SCRIPT.data&&SCRIPT.data.free),hadMusic:!!JAM.music,cues:JAM.cues||null,seed:JAM.seed||null,looks:JAM.looks,poolKept:JAM.poolKept||null,intensity:JAM.intensity,pins:JAM.pins||{},lyricLock:JAM.lyricLock||null,on:SCRIPT.on};
-    await DB.set("session",{v:1,ts:Date.now(),comp:serializeComp(),tl:TL.items,jam:jam,sel:sel,aspect:aspectSel.value});
+    sceneSync();
+    await DB.set("session",{v:1,ts:Date.now(),comp:serializeComp(),tl:TL.items,jam:jam,sel:sel,aspect:aspectSel.value,scn:{base:SCN.base,cur:SCN.cur}});
     AUTOSAVE.lastSig=sig;
   }catch(e){}
   AUTOSAVE.busy=false;
@@ -6696,6 +6878,7 @@ async function sessionRestore(){
   sel=clamp(+ses.sel||layers.length-1,0,layers.length-1);
   if(ses.aspect!=null){aspectSel.value=ses.aspect;ASPECT=+aspectSel.value||0;}
   TL.items=ses.tl||[];TL.hist=[];TL.fut=[];TL.sel=null;
+  SCN.base=(ses.scn&&ses.scn.base)||null;SCN.cur=(ses.scn&&ses.scn.cur)||null;if(SCN.out){disposeLayers(SCN.out.layers);SCN.out=null;}
   curPresetName="";markActiveCard();
   if(track&&AUDIO.load(track)){
     musicBtn.classList.add("on");musicTxt.textContent="♪ Lecture";
@@ -6707,6 +6890,7 @@ async function sessionRestore(){
   return true;
 }
 applyPreset(INTROS[0]);
+presetsLoad();
 // a saved session is offered, never forced: the preset is on stage meanwhile
 (async function(){
   let ses=null;try{ses=await DB.get("session");}catch(e){}
