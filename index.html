@@ -524,6 +524,36 @@ body.preview .panel{display:none}
 .playfx.go{animation:playfx .6s ease-out}
 @keyframes playfx{0%{opacity:1;transform:scale(.85)}100%{opacity:0;transform:scale(1.45)}}
 @media (prefers-reduced-motion:reduce){.playfx.go{animation:none}}
+/* lyrics editor: write the lines, tap them in time, export them */
+.lyed{margin:10px 16px 4px;padding:12px;border:1px solid var(--line-2);background:var(--surface-2);font-family:var(--mono)}
+.lyed .grp-h{margin:0 0 8px;padding:0}
+.lyed textarea{width:100%;min-height:96px;resize:vertical;background:var(--bg);color:var(--ink);border:1px solid var(--line-2);padding:8px;font:11.5px/1.5 var(--mono)}
+.lyed .lyrow{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.lyed .lyrow button{flex:1 1 auto;font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-dim);border:1px solid var(--line-2);padding:6px 8px;background:transparent;cursor:pointer}
+.lyed .lyrow button:hover{border-color:var(--accent);color:var(--ink)}
+.lyed .lyrow button.go{border-color:var(--accent);color:var(--accent)}
+.lyed p{margin:9px 0 0;font-size:10px;line-height:1.55;letter-spacing:.02em;color:var(--ink-dim)}
+.lyed p b{color:var(--ink);font-weight:700}
+.taphud{position:absolute;left:50%;bottom:54px;transform:translateX(-50%);z-index:9;width:min(620px,86%);padding:12px 16px;background:rgba(8,8,10,.86);border:1px solid var(--line-2);border-left:2px solid var(--accent);font-family:var(--mono);color:var(--ink);backdrop-filter:blur(6px)}
+.taphud .tc{font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+.taphud .tl{margin-top:6px;font:600 18px/1.3 var(--font)}
+.taphud .tn{margin-top:4px;font-size:12px;color:var(--ink-dim)}
+.taphud .tb{display:flex;gap:6px;margin-top:10px}
+.taphud .tb button{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;padding:6px 10px;border:1px solid var(--line-2);color:var(--ink-dim);background:transparent;cursor:pointer}
+.taphud .tb button:hover{color:var(--ink);border-color:var(--ink-dim)}
+.taphud .tb .go{border-color:var(--accent);color:var(--accent)}
+/* presentation: the picture alone, full screen, driven from the keyboard */
+body.present{padding:0}
+body.present header,body.present .cats,body.present .gallery,body.present .panel,body.present .dock,body.present .expand,body.present .coach,body.present .hint,body.present .badge,body.present .perf,body.present .taphud{display:none!important}
+body.present .stage{background:#000}
+body.present .stage-bg{display:none}
+body.present.idle,body.present.idle *{cursor:none!important}
+.preshud{position:absolute;left:50%;bottom:26px;transform:translateX(-50%);z-index:9;display:none;align-items:center;gap:14px;padding:9px 14px;background:rgba(8,8,10,.78);border:1px solid var(--line-2);font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;color:var(--ink-dim);white-space:nowrap;opacity:0;transition:opacity .25s;backdrop-filter:blur(6px)}
+body.present .preshud{display:flex}
+body.present:not(.idle) .preshud{opacity:1}
+.preshud b{color:var(--ink);font-weight:600}
+.preshud .pk{color:var(--ink-faint)}
+.preshud .pk kbd{color:var(--ink-dim);font-family:inherit}
 #cv{cursor:pointer}
 @media (max-width:1760px){header .act .kbd,header .act .lbl{display:none}}
 </style>
@@ -544,6 +574,7 @@ body.preview .panel{display:none}
     <span class="act" title="format du cadre — verrouille le rapport d'export"><span>▭</span><select id="aspectSel" aria-label="Format du cadre"><option value="1.77778" selected>16:9</option><option value="0">Libre</option><option value="0.5625">9:16</option><option value="1">1:1</option><option value="0.8">4:5</option><option value="1.33333">4:3</option><option value="2.33333">21:9</option></select></span>
     <button class="act" id="music" title="musique de fond (mp3) — pilote la pulsation audio-réactive et est incluse dans les enregistrements"><span id="musicTxt">♪ Musique</span></button>
     <button class="act" id="arrBtn" title="afficher la timeline d'arrangement du morceau chargé, sans réalisateur — ou replier / déplier celle de la jam (A)"><span>▤ Arrangement</span><span class="kbd">A</span></button>
+    <button class="act" id="presBtn" title="mode présentation : plein écran, interface masquée, clavier pour piloter (P)"><span>⛶ Présentation</span><span class="kbd">P</span></button>
     <button class="act" id="savePre" title="enregistrer cette composition dans un fichier" aria-label="Enregistrer la composition">⤓<span class="lbl">Enregistrer</span></button>
     <button class="act" id="loadPre" title="charger une composition enregistrée" aria-label="Charger une composition">⤒<span class="lbl">Charger</span></button>
     <button class="act" id="guideBtn" type="button" title="comment fonctionne VideoGen — guide et FAQ (H)" aria-label="Guide et FAQ">?</button>
@@ -582,6 +613,8 @@ body.preview .panel{display:none}
     <div class="hint" id="hint" role="button" tabindex="0">touchez une vignette · ≈ varier · ⚄ aléatoire · ? pour les raccourcis · H pour le guide</div>
     <div class="flash" id="flash"></div>
     <button class="expand" id="expand">⤢ Aperçu</button>
+    <div class="taphud" id="tapHud" hidden><div class="tc" id="tapC"></div><div class="tl" id="tapL"></div><div class="tn" id="tapN"></div><div class="tb"><button type="button" class="go" id="tapGo">Caler · Entrée</button><button type="button" id="tapBack">↶ Précédente</button><button type="button" id="tapEnd">✓ Terminer · Échap</button></div></div>
+    <div class="preshud" id="presHud"><b id="presName"></b><span id="presTime"></span><span class="pk"><kbd>Espace</kbd> lecture · <kbd>← →</kbd> ±5 s · <kbd>↑ ↓</kbd> presets · <kbd>G</kbd> aléatoire · <kbd>Échap</kbd> quitter</span></div>
   </div>
   <section class="dock" id="dock" aria-label="Timeline d'arrangement">
     <div class="dk-rz" id="dkRz" title="glissez pour agrandir ou réduire la timeline — les pistes grandissent avec elle"></div>
@@ -658,6 +691,7 @@ body.preview .panel{display:none}
     <div class="krow"><span>Exporter un PNG</span><b>S</b></div>
     <div class="krow"><span>Enregistrer une vidéo</span><b>C</b></div>
     <div class="krow"><span>Aperçu plein écran</span><b>F</b></div>
+    <div class="krow"><span>Mode présentation</span><b>P</b></div>
     <div class="krow"><span>Lecture / pause (ou clic sur l'image)</span><b>Espace</b></div>
     <div class="krow"><span>Afficher / replier l'arrangement</span><b>A</b></div>
     <div class="krow"><span>Guide et FAQ</span><b>H</b></div>
@@ -702,7 +736,7 @@ body.preview .panel{display:none}
     <figure class="gfig"><div class="gshot" data-shot="preset:Fire Up"></div><figcaption>Fire Up</figcaption></figure>
     <figure class="gfig"><div class="gshot" data-shot="preset:Hyperzoom"></div><figcaption>Hyperzoom</figcaption></figure>
   </div>
-  <p class="gd-cap">Quatre des 48 presets, rendus en direct par l'application elle-même.</p>
+  <p class="gd-cap">Quatre des 52 presets, rendus en direct par l'application elle-même.</p>
   <div class="gd-tip">Votre travail est <b>sauvegardé automatiquement</b> dans ce navigateur : si l'onglet se ferme, l'ouverture suivante propose de reprendre la session là où elle en était, fichiers compris.</div>
 </section>
 
@@ -745,6 +779,8 @@ body.preview .panel{display:none}
     <li><i>5</i><span><b>Scène</b> — l'image en direct. La pastille indique les images par seconde et la résolution de l'aperçu.</span></li>
     <li><i>6</i><span><b>Arrangement</b> — la timeline du morceau, pendant une Jam Session.</span></li>
   </ul>
+  <h3>Mode présentation</h3>
+  <p><b>⛶ Présentation</b> (ou <kbd>P</kbd>) passe en plein écran et masque toute l'interface : il ne reste que l'image. Le curseur disparaît après quelques secondes ; bougez la souris pour voir le nom du preset, le temps et les touches. <kbd>Espace</kbd> lance ou arrête la musique, <kbd>←</kbd> <kbd>→</kbd> reculent et avancent de 5 s, <kbd>↑</kbd> <kbd>↓</kbd> passent au preset précédent ou suivant (vos presets compris), <kbd>G</kbd> tire une composition aléatoire, <kbd>Échap</kbd> revient au studio. La jam, les scènes et les images-clés continuent de tourner derrière.</p>
 </section>
 
 <section id="g-layers">
@@ -769,16 +805,18 @@ body.preview .panel{display:none}
     <tr><td>Fond</td><td>Aplats unis, dégradés linéaires ou radiaux, maillage ou bruit.</td></tr>
     <tr><td>Champ</td><td>Champs génératifs animés : flux, anneaux, plasma, points.</td></tr>
     <tr><td>Fumée</td><td>Fumée fluide, feu, énergie ou nuages.</td></tr>
-    <tr><td>Image · Vidéo</td><td>Votre propre image ou clip, avec du mouvement.</td></tr>
+    <tr><td>Image · Vidéo</td><td>Votre propre image ou clip, avec du mouvement. La vidéo peut réagir au son : vitesse sur les basses, flash et zoom sur les coups, montage au rythme (saut, bégaiement, retour).</td></tr>
     <tr><td>VJ Deck</td><td>Mixe vos photos et clips sur le temps, avec des transitions.</td></tr>
     <tr><td>Texte</td><td>Typographie cinétique avec matières 3D, comportements et entrées.</td></tr>
-    <tr><td>Paroles</td><td>Les paroles d'un fichier .srt, synchronisées avec la musique.</td></tr>
+    <tr><td>Paroles</td><td>Les paroles d'un fichier .srt ou .lrc, ou tapées dans l'éditeur et calées au clavier pendant la lecture.</td></tr>
     <tr><td>Forme 3D</td><td>Un objet 3D éclairé.</td></tr>
     <tr><td>Essaim · Particules</td><td>Des milliers de points : orbites et flux, ou un texte qui s'assemble, se disperse, explose ou tourbillonne.</td></tr>
+    <tr><td>Émetteur</td><td>Pluie, neige, étincelles, poussière, confettis, bulles, lucioles ou braises : des particules émises en continu et en salves sur les temps, avec gravité, vent, turbulence, traînées et lueur.</td></tr>
     <tr><td>Halos</td><td>Reflets d'objectif et traînées de lumière.</td></tr>
     <tr><td>Masque</td><td>Découpe tout ce qui est dessous : une forme (rectangle, ellipse, polygone, étoile), un dégradé, un texte ou des bandes ; inversable, bords fondus, intensité ; la zone retirée prend une couleur de fond ou reste transparente.</td></tr>
     <tr><td>Spectre</td><td>L'analyse en direct du son joué : barres, ligne, aire, points, cercle ou anneau ; bandes réparties sur une échelle logarithmique ou linéaire entre deux fréquences, gain, courbe, lissage et crêtes ; couleur unie, dégradée, par niveau ou arc-en-ciel. Sans musique, une respiration légère tient la place.</td></tr>
     <tr><td>Traitement</td><td>Un effet appliqué à tout ce qui est dessous : ASCII, points, tramage, pixel, RVB, CRT, glitch, thermique, kaléidoscope, tri de pixels, liquide, chrome, datamosh, VHS, griffonnage, énergie, 2.5D, Amiga.</td></tr>
+    <tr><td>Déformation</td><td>Déforme tout ce qui est dessous : ondulation, ondes, tourbillon, loupe, pincement, miroir et kaléidoscope, tranches, pixellisation, dispersion des couleurs, tremblement, mosaïque ; l'intensité suit les basses et les coups, et chaque réglage accepte des images-clés.</td></tr>
     <tr><td>Micrographe</td><td>Un habillage technique façon HUD : grilles, nœuds, relevés.</td></tr>
     <tr><td>Post FX</td><td>L'étalonnage final : bloom, aberration chromatique, vignettage, grain, exposition, couleur.</td></tr>
     <tr><td>Caméra</td><td>Ne dessine rien : elle déplace chaque calque selon sa profondeur et ajoute des transitions entre les sections d'une jam.</td></tr>
@@ -889,7 +927,7 @@ body.preview .panel{display:none}
 
 <section id="g-ideas">
   <h2><span class="n">07</span>Presets, aléatoire et variations</h2>
-  <ul><li><b>Galerie</b> : 20 Intros (ouvertures avec titre) et 28 Scènes. Touchez pour charger.</li><li><b>⚄ Aléatoire</b> <kbd>G</kbd> construit une composition entièrement nouvelle.</li><li><b>≈ Varier</b> <kbd>V</kbd> décale un peu chaque réglage — la même idée, une autre prise.</li><li><b>◇ Mélanger</b> <kbd>R</kbd> retire les réglages de chaque calque et garde la pile.</li><li><b>↶ ↷</b> annulent et rétablissent n'importe quoi <kbd>Ctrl Z</kbd> <kbd>Ctrl Maj Z</kbd>.</li><li><b>⤓ Enregistrer</b> écrit la composition dans un fichier .json et <b>⤒ Charger</b> la ramène. Vos fichiers multimédias n'y sont pas inclus : gardez-les à côté.</li></ul>
+  <ul><li><b>Galerie</b> : 20 Intros (ouvertures avec titre) et 32 Scènes. Touchez pour charger.</li><li><b>⚄ Aléatoire</b> <kbd>G</kbd> construit une composition entièrement nouvelle.</li><li><b>≈ Varier</b> <kbd>V</kbd> décale un peu chaque réglage — la même idée, une autre prise.</li><li><b>◇ Mélanger</b> <kbd>R</kbd> retire les réglages de chaque calque et garde la pile.</li><li><b>↶ ↷</b> annulent et rétablissent n'importe quoi <kbd>Ctrl Z</kbd> <kbd>Ctrl Maj Z</kbd>.</li><li><b>⤓ Enregistrer</b> écrit la composition dans un fichier .json et <b>⤒ Charger</b> la ramène. Vos fichiers multimédias n'y sont pas inclus : gardez-les à côté.</li></ul>
   <h3>Mes presets</h3>
   <p>Dans la barre des catégories, <b>＋ Preset</b> enregistre la composition en cours comme preset nommé, avec sa vignette, dans la catégorie <b>Mes presets</b> — à côté des Intros et des Scènes, et conservé dans ce navigateur avec la session. Au survol d'une carte, <b>✕</b> la supprime. <b>⤓ Exporter</b> écrit tous vos presets dans un fichier .json (vignettes et polices comprises) et <b>⤒ Importer</b> les ajoute depuis un tel fichier, ou depuis une composition enregistrée avec ⤓ Enregistrer : de quoi partager une bibliothèque d'équipe. Les fichiers multimédias ne sont pas dans les presets.</p>
   <button class="gd-go" type="button" data-go="random">Essayer ⚄ Aléatoire</button>
@@ -897,6 +935,7 @@ body.preview .panel{display:none}
 
 <section id="g-music">
   <h2><span class="n">08</span>Musique et réactivité</h2>
+  <p>Trois calques sont faits pour la musique. <b>Vidéo → Réactif au son</b> fait varier la vitesse du clip avec les basses, le fait flasher et zoomer sur les coups, saturer sur les aigus, et le monte au rythme : <b>Saut aléatoire</b> coupe vers un autre moment du clip à chaque temps, chaque mesure ou chaque coup, <b>Bégaiement</b> rejoue en boucle les derniers instants, <b>Retour au début</b> relance le clip. L'<b>Émetteur</b> lâche ses particules en continu et en <b>salves</b> sur les temps, les mesures ou les coups ; les basses accélèrent le flux, les coups grossissent les grains. La <b>Déformation</b> tord l'image dessous et son intensité monte avec les basses et les coups.</p>
   <p><b>♪ Musique</b> charge une piste (mp3, wav, m4a, aac, ogg, flac, opus). Cliquez à nouveau pour mettre en pause ; clic droit pour en choisir une autre. VideoGen écoute les graves (le kick), les médiums, les aigus et chaque coup, et mesure le tempo et la grille rythmique sur tout le fichier, pour que les coupes tombent sur le temps dès la première mesure.</p>
   <div class="gd-tip">Montez <b>Pulsation audio</b> sur un calque pour le faire respirer avec la musique. La pastille de la barre supérieure affiche les BPM et, dans une jam, la section en cours.</div>
   <p>Pour <b>voir</b> le son, ajoutez un calque <b>Spectre</b> (<b>＋ Ajouter → Spectre</b>, ou le look « Spectre » d'une jam) : il dessine en direct les bandes de fréquences du morceau, en barres, ligne, aire, points, cercle ou anneau. <b>Grave</b> et <b>Aigu</b> bornent la plage analysée, <b>Gain</b> et <b>Courbe</b> règlent la réponse, <b>Lissage</b> la détente ; <b>Symétrie</b> place les graves au centre. Les exports vidéo le calculent image par image à partir du fichier, exactement comme la version en direct.</p>
@@ -936,7 +975,7 @@ body.preview .panel{display:none}
     <figure class="gfig"><div class="gshot" data-shot="look:sort"></div><figcaption>Tri de pixels</figcaption></figure>
     <figure class="gfig"><div class="gshot" data-shot="look:retro"></div><figcaption>Rétro</figcaption></figure>
   </div>
-  <p class="gd-cap">Six des quinze looks que mixe le réalisateur, sur la même scène.</p>
+  <p class="gd-cap">Six des dix-sept looks que mixe le réalisateur, sur la même scène.</p>
   <p>Le <b>VJ Deck</b> mixe vos photos et clips : il coupe au demi-temps, au temps, à la mesure ou toutes les 4 mesures, avec des transitions coupe, fondu, flash, glissement, zoom ou double exposition. Les photos reçoivent une lente avancée, les vidéos redémarrent à chaque coupe.</p>
   <div class="gd-tip">Les réglages que vous touchez sont à vous : changez la saturation d'un calque et le réalisateur la garde pour le reste de la jam. Le panneau vous dit ce qui est à vous ; <b>↺ le rendre au réalisateur</b> l'annule.</div>
   <button class="gd-go" type="button" data-go="jam">Ouvrir la Jam Session</button>
@@ -1001,6 +1040,8 @@ body.preview .panel{display:none}
 <section id="g-lyrics">
   <h2><span class="n">11</span>Paroles</h2>
   <p>Chargez un .srt ou un .lrc avec le morceau — dans la Jam, ou avec <b>↑ Importer des paroles .srt / .lrc</b> sur un calque Paroles. Chaque ligne apparaît à son repère avec le même moteur typographique, les mêmes matières et les mêmes entrées que les calques Texte, sur un fond qui la garde lisible.</p>
+  <h3>Écrire et synchroniser au clavier</h3>
+  <p>Pas de fichier de paroles ? Sur un calque Paroles, l'<b>Éditeur de paroles</b> accepte le texte brut, une ligne par ligne chantée. <b>⏺ Synchro au clavier</b> lance la musique depuis la tête de lecture et affiche la ligne en cours sur l'image : appuyez sur <kbd>Entrée</kbd> (ou <kbd>↓</kbd>) au moment où elle commence, <kbd>Retour</kbd> reprend la précédente, <kbd>Échap</kbd> termine. Les lignes calées s'affichent au fur et à mesure ; les mots sont ensuite répartis comme pour un .srt. <b>≡ Répartir</b> étale les lignes à intervalles réguliers sur le morceau quand il suffit d'une base à corriger, et <b>⤓ .lrc</b> enregistre le résultat pour le réutiliser.</p>
   <h3>Un seul style pour tout le morceau</h3>
   <div class="gd-two">
     <ol><li>Sélectionnez le calque Paroles.</li><li>Réglez police, taille, matière, position, entrée, sortie et fond.</li><li>Appuyez sur <b>⤓ Appliquer à tout le morceau</b>.</li></ol>
@@ -1187,6 +1228,8 @@ body.preview .panel{display:none}
     <tr><td><kbd>S</kbd></td><td>Exporter un PNG</td></tr>
     <tr><td><kbd>C</kbd></td><td>Enregistrer / rendre une vidéo</td></tr>
     <tr><td><kbd>F</kbd></td><td>Aperçu plein écran</td></tr>
+    <tr><td><kbd>P</kbd></td><td>Mode présentation : plein écran sans interface ; <kbd>← →</kbd> ±5 s, <kbd>↑ ↓</kbd> preset précédent / suivant, <kbd>G</kbd> aléatoire, <kbd>Échap</kbd> quitter</td></tr>
+    <tr><td><kbd>Entrée</kbd> · <kbd>↓</kbd></td><td>Synchro des paroles au clavier : caler la ligne en cours ; <kbd>Retour</kbd> reprend la précédente, <kbd>Échap</kbd> termine</td></tr>
     <tr><td><kbd>A</kbd></td><td>Afficher la timeline d'arrangement du morceau chargé (ou la replier / déplier)</td></tr>
     <tr><td><kbd>H</kbd></td><td>Ce guide</td></tr>
     <tr><td><kbd>?</kbd></td><td>Fiche des raccourcis</td></tr>
@@ -1770,7 +1813,7 @@ const GLX={ok:false,tried:false,gl:null,cv:null,cache:{},texs:{},
     gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);
     gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);},
   // uniform locations never change for a linked program: look each one up once
-  u(pr,n){const c=pr.__ul||(pr.__ul={});let l=c[n];if(l===undefined)l=c[n]=this.GLX.u(pr,n);return l;},
+  u(pr,n){const c=pr.__ul||(pr.__ul={});let l=c[n];if(l===undefined)l=c[n]=this.gl.getUniformLocation(pr,n);return l;},
   run(key,fsrc,W,H,setup){if(!this.init())return null;const gl=this.gl;
     if(this.cv.width!==W||this.cv.height!==H){this.cv.width=W;this.cv.height=H;}
     const pr=this.prog(key,fsrc);if(!pr)return null;
@@ -1945,22 +1988,26 @@ function renderMedia(c,W,H,t,p,st,isVideo){
     c.fillText(st._urlErr?st._urlErr:(isVideo?"↑ importez une vidéo":"↑ importez une image"),W/2,H/2);
     return;
   }
-  if(isVideo){try{const sp=clamp(p.speed||1,.1,4);if(m.playbackRate!==sp)m.playbackRate=sp;if(m.paused){const g=m.play();if(g&&g.catch)g.catch(()=>{});}}catch(e){}}
+  const live=AUDIO.playing(),hit=live?AUDIO.hit:0;
+  if(isVideo){try{let sp=clamp(p.speed||1,.1,4);if(live&&p.rSpeed)sp=clamp(sp*(1+AUDIO.bass*p.rSpeed),.1,8);if(m.playbackRate!==sp)m.playbackRate=sp;
+    if(live&&p.rCut&&p.rCut!=="off")videoCut(m,p,st);
+    if(m.paused){const g=m.play();if(g&&g.catch)g.catch(()=>{});}}catch(e){}}
   const mw=mediaW(m),mh=mediaH(m),ia=mw/mh,ta=W/H;
   let dw,dh;
   if(p.fit==="contain"){if(ia>ta){dw=W;dh=W/ia;}else{dh=H;dw=H*ia;}}
   else if(p.fit==="fill"){dw=W;dh=H;}
   else{if(ia>ta){dh=H;dw=H*ia;}else{dw=W;dh=W/ia;}}
-  const s=p.scale||1;dw*=s;dh*=s;
+  const s=(p.scale||1)*(1+hit*(p.rZoom||0)*.14);dw*=s;dh*=s;
   const par=p.parallax||0,ox=(pointer.x-.5)*W*.07*par,oy=(pointer.y-.5)*H*.07*par;
   const dx=(W-dw)/2+ox+(p.px||0)*W/100,dy=(H-dh)/2+oy+(p.py||0)*H/100;
   c.save();
   const r=(p.radius||0)*RSCALE;
   if(r>0){roundPath(c,dx,dy,dw,dh,r);c.clip();}
   const f=[];
-  if(p.bright!=null&&p.bright!==1)f.push("brightness("+p.bright+")");
+  const br=(p.bright==null?1:p.bright)*(1+hit*(p.rFlash||0)*.9),sat=(p.satF==null?1:p.satF)*(1+(live?AUDIO.high:0)*(p.rSat||0)*1.2);
+  if(br!==1)f.push("brightness("+br.toFixed(3)+")");
   if(p.contrastF!=null&&p.contrastF!==1)f.push("contrast("+p.contrastF+")");
-  if(p.satF!=null&&p.satF!==1)f.push("saturate("+p.satF+")");
+  if(sat!==1)f.push("saturate("+sat.toFixed(3)+")");
   if(p.blurF)f.push("blur("+(p.blurF*RSCALE).toFixed(1)+"px)");
   if(f.length){try{c.filter=f.join(" ");}catch(e){}}
   try{c.drawImage(m,dx,dy,dw,dh);}catch(e){}
@@ -1979,6 +2026,19 @@ function renderMedia(c,W,H,t,p,st,isVideo){
       c.restore();
     }
   }
+}
+// the clip cut to the music: a jump to another moment, a stutter on the last
+// instants, or back to the start — on each beat, each bar or each hit
+function videoCut(m,p,st){
+  const d=m.duration;if(!isFinite(d)||d<=0)return;
+  const ev=p.rEvery||"beat";let trig=false;
+  if(ev==="hit"){if(AUDIO.hit>.55&&st._armed!==false){trig=true;st._armed=false;}if(AUDIO.hit<.3)st._armed=true;}
+  else{const n=ev==="bar"?AUDIO.barNo:AUDIO.beatNo;if(n!==st._bn){trig=st._bn!==undefined;st._bn=n;}}
+  if(trig&&Math.random()<=(p.rChance==null?1:p.rChance)){
+    if(p.rCut==="jump")m.currentTime=Math.random()*Math.max(0,d-.5);
+    else if(p.rCut==="rewind")m.currentTime=0;
+    else if(p.rCut==="stutter")st._loopA=m.currentTime;}
+  if(p.rCut==="stutter"&&st._loopA!=null&&m.currentTime>st._loopA+(p.rLen||.2))m.currentTime=st._loopA;
 }
 const MEDIA_FRAME=[
   {g:"Cadre"},
@@ -2019,6 +2079,100 @@ async function fontsFromImport(list){for(const f of (list||[])){if(!f||!f.data||
 
 const RAMP=" .:-=+*#%@";const BAYER=[[0,8,2,10],[12,4,14,6],[3,11,1,9],[15,7,13,5]];
 function makeDefaultImg(){const o=newCanvas(512,512),c=o.getContext("2d");const g=c.createLinearGradient(0,0,512,512);g.addColorStop(0,"#ff6a4d");g.addColorStop(.5,"#5b6bff");g.addColorStop(1,"#d8ff3b");c.fillStyle=g;c.fillRect(0,0,512,512);for(let i=0;i<7;i++){c.globalAlpha=.5;c.fillStyle=hslHex(i*47,80,60);c.beginPath();c.arc(rand(60,452),rand(60,452),rand(40,130),0,7);c.fill();}return o;}
+
+/* ---- emitter: particles born in a stream and in bursts on the beat ---- */
+// o: where they appear · v: starting velocity (frame heights per second) · g: own gravity
+// tb: wander · sz: size factor · sh: default mark · life: natural life at the default slider
+// col: natural palette · fl: flicker · spin: tumbling
+const EMIT_KIND={
+  rain:{o:"top",v:[0,2.2],g:1.2,tb:.05,sz:.6,sh:"line",life:1.2,col:["#9ad0ff","#dff3ff"],fl:0,spin:0},
+  snow:{o:"top",v:[0,.22],g:.04,tb:.5,sz:1,sh:"dot",life:6,col:["#ffffff","#cfe6ff"],fl:0,spin:0},
+  sparks:{o:"bottom",v:[0,-1.5],g:.9,tb:.3,sz:.7,sh:"dot",life:1.4,col:["#ffd166","#ff5e3a"],fl:.6,spin:0},
+  dust:{o:"all",v:[0,0],g:0,tb:.35,sz:.6,sh:"dot",life:6,col:["#ffffff","#ffe9c4"],fl:.3,spin:0},
+  confetti:{o:"top",v:[0,.5],g:.35,tb:.9,sz:1.6,sh:"square",life:4,col:["#ff5ea8","#3de1ff","#d8ff3b","#ffb347","#8a8aff"],fl:0,spin:1},
+  bubbles:{o:"bottom",v:[0,-.45],g:-.12,tb:.5,sz:1.8,sh:"ring",life:5,col:["#bfefff","#ffffff"],fl:0,spin:0},
+  fireflies:{o:"all",v:[0,0],g:0,tb:.6,sz:.8,sh:"dot",life:5,col:["#d8ff3b","#ffe28a"],fl:1,spin:0},
+  embers:{o:"bottom",v:[0,-.55],g:-.18,tb:.5,sz:.8,sh:"dot",life:3,col:["#ff6a1a","#ffd166"],fl:.8,spin:0}
+};
+const EMIT_MAX=6000;
+function emitColor(p,K,i){
+  const m=p.cmode||"dual";
+  if(m==="single")return p.c1;
+  if(m==="rainbow")return hslHex((i*47)%360,85,62);
+  if(m==="palette")return K.col[i%K.col.length];
+  const A=hx(p.c1),B=hx(p.c2),u=Math.random();
+  return "rgb("+(lerp(A[0],B[0],u)|0)+","+(lerp(A[1],B[1],u)|0)+","+(lerp(A[2],B[2],u)|0)+")";
+}
+/* ---- warp: the picture below, resampled through a displacement ---- */
+const WARP_FS=`precision highp float;
+varying vec2 uv;
+uniform sampler2D src;
+uniform vec2 res,ctr;
+uniform float time,amt,freq,ang,mode,edge,mixv,jx,jy;
+float hash(float n){return fract(sin(n*127.1+311.7)*43758.5453);}
+vec4 pick(vec2 q){
+  if(edge<.5)q=1.0-abs(mod(q,2.0)-1.0);
+  else if(edge<1.5)q=clamp(q,0.0,1.0);
+  else if(edge<2.5)q=fract(q);
+  else if(q.x<0.0||q.x>1.0||q.y<0.0||q.y>1.0)return vec4(0.0);
+  return texture2D(src,q);
+}
+void main(){
+  float asp=res.x/res.y;
+  vec2 dir=vec2(cos(ang),sin(ang)),nrm=vec2(-dir.y,dir.x);
+  vec2 d=(uv-ctr)*vec2(asp,1.0);
+  float r=length(d);
+  vec2 q=uv;vec4 col;
+  int m=int(mode+0.5);
+  if(m==0){
+    float s=dot(uv*vec2(asp,1.0),dir)*freq*14.0;
+    q+=nrm*(sin(s+time*3.0)*0.08+sin(s*2.3-time*4.1)*0.025)*amt;
+  }else if(m==1){
+    float w=sin(r*freq*42.0-time*5.0)*amt*0.035*(1.0-smoothstep(0.0,0.9,r));
+    q+=(r>0.0001?d/r:vec2(0.0))*w/vec2(asp,1.0);
+  }else if(m==2){
+    float R=0.55/max(freq,0.05),f=1.0-smoothstep(0.0,R,r);
+    float a=amt*7.0*f*f*(0.8+0.2*sin(time*2.0));
+    float cs=cos(a),sn=sin(a);
+    d=vec2(d.x*cs-d.y*sn,d.x*sn+d.y*cs);
+    q=ctr+d/vec2(asp,1.0);
+  }else if(m==3||m==4){
+    float R=0.6/max(freq,0.05),f=smoothstep(R,0.0,r),k=amt*(1.0+0.15*sin(time*2.5));
+    d*=(m==3)?1.0-k*f*0.8:1.0+k*f*1.4;
+    q=ctr+d/vec2(asp,1.0);
+  }else if(m==5){
+    float n=floor(freq*2.0+0.5);
+    vec2 e=vec2(d.x*dir.x+d.y*dir.y,-d.x*dir.y+d.y*dir.x);
+    if(n<=1.0){e.x=abs(e.x);}
+    else if(n<=2.0){e=abs(e);}
+    else{float a=atan(e.y,e.x)+time*0.3*amt,seg=6.2831853/n;a=mod(a,seg);a=abs(a-seg*0.5);e=vec2(cos(a),sin(a))*length(e);}
+    d=vec2(e.x*dir.x-e.y*dir.y,e.x*dir.y+e.y*dir.x);
+    q=ctr+d/vec2(asp,1.0);
+  }else if(m==6){
+    float bands=4.0+freq*22.0,b=floor(dot(uv,nrm)*bands),tk=floor(time*4.0);
+    float h=hash(b+tk*57.0),g=hash(b*3.1+tk*13.0);
+    q+=dir*(h-0.5)*amt*0.35*step(0.55,g);
+  }else if(m==7){
+    float cell=mix(2.0,90.0,amt)*freq;
+    vec2 px=cell/res;
+    q=(floor(uv/px)+0.5)*px;
+  }else if(m==8){
+    vec2 o=dir*amt*0.03*(0.4+r*1.2)*(0.75+0.25*sin(time*3.0));
+    col.r=pick(q+o).r;col.g=pick(q).g;col.b=pick(q-o).b;col.a=pick(q).a;
+    gl_FragColor=mix(texture2D(src,uv),col,mixv);return;
+  }else if(m==9){
+    q+=vec2(jx,jy)*amt*0.08;
+    float b=floor(uv.y*(6.0+freq*10.0)),h=hash(b+floor(time*9.0)*31.0);
+    if(h>0.86)q.x+=(hash(b*7.0+time)-0.5)*amt*0.25;
+  }else{
+    float k=1.0+amt*4.0*freq;
+    q=fract((uv-ctr)*k+0.5+time*0.05*dir);
+  }
+  col=pick(q);
+  gl_FragColor=mix(texture2D(src,uv),col,mixv);
+}`;
+const WARP_MODE={wave:0,ripple:1,twirl:2,bulge:3,pinch:4,mirror:5,slices:6,pixel:7,chroma:8,jitter:9,tile:10};
+const WARP_EDGE={mirror:0,clamp:1,wrap:2,transp:3};
 
 const TOOLS={
 bg:{name:"Fond",accent:"#8a8aff",schema:[
@@ -2588,6 +2742,112 @@ particles:{name:"Particules",accent:"#ff5ea8",defBlend:"screen",schema:[
   },
   randomize(p){p.mode=pick(["assemble","disperse","explode","swirl"]);p.speed=+rand(.5,2).toFixed(2);p.spread=+rand(.6,2).toFixed(2);p.psize=+rand(1.5,4).toFixed(1);p.count=Math.round(rand(1500,6000)/100)*100;}
 },
+emit:{name:"Émetteur",accent:"#ffb347",defBlend:"screen",schema:[
+  {g:"Émission"},
+  {type:"seg",key:"kind",label:"Type",default:"sparks",options:[{v:"rain",label:"Pluie"},{v:"snow",label:"Neige"},{v:"sparks",label:"Étincelles"},{v:"dust",label:"Poussière"},{v:"confetti",label:"Confettis"},{v:"bubbles",label:"Bulles"},{v:"fireflies",label:"Lucioles"},{v:"embers",label:"Braises"}]},
+  {type:"seg",key:"origin",label:"Origine",default:"auto",options:[{v:"auto",label:"Auto"},{v:"top",label:"Haut"},{v:"bottom",label:"Bas"},{v:"center",label:"Centre"},{v:"edges",label:"Bords"},{v:"all",label:"Partout"}]},
+  {type:"range",key:"rate",label:"Débit (par seconde)",min:0,max:600,step:5,default:120},
+  {type:"range",key:"life",label:"Durée de vie",min:.2,max:8,step:.1,default:2.5},
+  {type:"range",key:"spread",label:"Dispersion",min:0,max:1,step:.01,default:.35},
+  {g:"Rythme"},
+  {type:"seg",key:"beat",label:"Salve",default:"hit",options:[{v:"off",label:"Aucune"},{v:"beat",label:"Chaque temps"},{v:"bar",label:"Chaque mesure"},{v:"hit",label:"Sur les coups"}]},
+  {type:"range",key:"burst",label:"Taille de la salve",min:0,max:400,step:5,default:80},
+  {type:"range",key:"audio",label:"Vitesse sur les basses",min:0,max:3,step:.01,default:.8},
+  {type:"range",key:"audioSize",label:"Taille sur les coups",min:0,max:3,step:.01,default:.5},
+  {g:"Physique"},
+  {type:"range",key:"speed",label:"Vitesse",min:0,max:3,step:.01,default:1},
+  {type:"range",key:"gravity",label:"Gravité en plus",min:-2,max:2,step:.01,default:0},
+  {type:"range",key:"wind",label:"Vent",min:-2,max:2,step:.01,default:0},
+  {type:"range",key:"turb",label:"Turbulence",min:0,max:3,step:.01,default:1},
+  {type:"range",key:"drag",label:"Frottement",min:0,max:1,step:.01,default:0},
+  {g:"Aspect"},
+  {type:"seg",key:"shape",label:"Forme",default:"auto",options:[{v:"auto",label:"Auto"},{v:"dot",label:"Point"},{v:"ring",label:"Anneau"},{v:"line",label:"Trait"},{v:"square",label:"Carré"},{v:"star",label:"Étoile"},{v:"glyph",label:"Caractère"}]},
+  {type:"text",key:"glyphs",label:"Caractères (forme Caractère)",default:"✦✧★·"},
+  {type:"range",key:"size",label:"Taille",min:1,max:60,step:.5,default:6},
+  {type:"range",key:"sizeVar",label:"Variation de taille",min:0,max:1,step:.01,default:.6},
+  {type:"range",key:"trail",label:"Traînée",min:0,max:1,step:.01,default:.35},
+  {type:"range",key:"glow",label:"Lueur",min:0,max:1,step:.01,default:.4},
+  {type:"range",key:"fade",label:"Fondu en fin de vie",min:0,max:1,step:.01,default:.7},
+  {g:"Couleur"},
+  {type:"seg",key:"cmode",label:"Couleurs",default:"palette",options:[{v:"palette",label:"Naturelle"},{v:"single",label:"Une"},{v:"dual",label:"Deux"},{v:"rainbow",label:"Arc-en-ciel"}]},
+  {type:"color",key:"c1",label:"Couleur A",default:"#ffb347"},
+  {type:"color",key:"c2",label:"Couleur B",default:"#ff3d81"}],
+  initState(){return{ps:[],acc:0,t:0,n:0,bn:null,brn:null,armed:true,pc:null,pk:""};},
+  spawn(st,p,K,W,H,n,burst){
+    const ps=st.ps,org=p.origin==="auto"?K.o:p.origin,M=Math.max(W,H);
+    const still=!K.v[0]&&!K.v[1];
+    for(let i=0;i<n&&ps.length<EMIT_MAX;i++){
+      const r=Math.random;let x,y;
+      if(org==="top"){x=r()*W*1.2-W*.1;y=-12*RSCALE;}
+      else if(org==="bottom"){x=r()*W*1.2-W*.1;y=H+12*RSCALE;}
+      else if(org==="center"){const a=r()*6.283,rr=r()*p.spread*M*.12;x=W/2+Math.cos(a)*rr;y=H/2+Math.sin(a)*rr;}
+      else if(org==="edges"){const e=(r()*4)|0;if(e===0){x=r()*W;y=-12*RSCALE;}else if(e===1){x=r()*W;y=H+12*RSCALE;}else if(e===2){x=-12*RSCALE;y=r()*H;}else{x=W+12*RSCALE;y=r()*H;}}
+      else{x=r()*W;y=r()*H;}
+      let vx=K.v[0],vy=K.v[1];
+      // a burst, or a kind with no drift of its own, leaves the origin in every direction
+      if(burst||(still&&(org==="center"||org==="edges"))){const a=r()*6.283,mg=(still?.35:.5)+r()*.6;vx+=Math.cos(a)*mg;vy+=Math.sin(a)*mg;}
+      else if(org==="center"&&!still){const a=r()*6.283;vx=Math.cos(a)*Math.hypot(K.v[0],K.v[1]);vy=Math.sin(a)*Math.hypot(K.v[0],K.v[1]);}
+      const a2=(r()-.5)*Math.PI*p.spread,cs=Math.cos(a2),sn=Math.sin(a2),k=H*p.speed*(burst?1.5:1)*(.6+.8*r());
+      const rvx=(vx*cs-vy*sn)*k,rvy=(vx*sn+vy*cs)*k;
+      st.n++;
+      ps.push({x,y,vx:rvx,vy:rvy,age:0,life:Math.max(.1,K.life*p.life/2.5*(.6+.8*r())),sz:1-p.sizeVar*r(),col:emitColor(p,K,st.n),rot:r()*6.283,spin:(r()-.5)*(K.spin?6:.6),ph:r()*6.283,sd:r()*100});
+    }
+  },
+  step(st,p,K,W,H,dt,t,live){
+    const ps=st.ps,bass=live?AUDIO.bass:0,spd=1+bass*p.audio,g=(K.g+p.gravity)*H,wind=p.wind*H*.5,tb=K.tb*p.turb*H*.9,drag=p.drag*2.5;
+    let w=0;
+    for(let i=0;i<ps.length;i++){const o=ps[i];
+      o.age+=dt;if(o.age>=o.life)continue;
+      const nx=n3(o.x*.004+o.sd,o.y*.004,t*.0005+o.sd),ny=n3(o.y*.004-o.sd,o.x*.004+7,t*.0005-o.sd);
+      o.vx+=(wind+nx*tb)*dt;o.vy+=(g+ny*tb*.7)*dt;
+      if(drag){const f=Math.max(0,1-drag*dt);o.vx*=f;o.vy*=f;}
+      o.x+=o.vx*dt*spd;o.y+=o.vy*dt*spd;o.rot+=o.spin*dt;
+      if(o.x<-W*.25||o.x>W*1.25||o.y<-H*.3||o.y>H*1.3)continue;
+      ps[w++]=o;}
+    ps.length=w;
+  },
+  render(c,W,H,t,p,st){
+    const K=EMIT_KIND[p.kind]||EMIT_KIND.sparks,live=AUDIO.playing();
+    const key=p.kind+"|"+W+"x"+H;if(st.pk!==key){st.pk=key;st.ps.length=0;st.t=0;if(st.pc){st.pc.width=W;st.pc.height=H;}}
+    let dt=st.t?clamp((t-st.t)*.001,0,.1):1/60;st.t=t;
+    // a thumbnail has no past: settle the stream first
+    const steps=THUMB&&!st.ps.length?48:1;
+    for(let k=0;k<steps;k++){const sdt=steps>1?1/30:dt;
+      st.acc+=p.rate*sdt;const n=st.acc|0;st.acc-=n;if(n)this.spawn(st,p,K,W,H,n,false);
+      if(live&&p.beat!=="off"&&p.burst>0){let fire=false;
+        if(p.beat==="hit"){if(AUDIO.hit>.55&&st.armed){fire=true;st.armed=false;}if(AUDIO.hit<.3)st.armed=true;}
+        else{const n2=p.beat==="bar"?AUDIO.barNo:AUDIO.beatNo;if(st.bn!==n2){fire=st.bn!=null;st.bn=n2;}}
+        if(fire)this.spawn(st,p,K,W,H,p.burst|0,true);}
+      else if(THUMB&&k===20)this.spawn(st,p,K,W,H,p.burst|0,true);
+      this.step(st,p,K,W,H,sdt,t,live);}
+    // trails: the previous frame fades under the new one
+    let pc=st.pc;if(!pc){pc=st.pc=newCanvas(W,H);}if(pc.width!==W||pc.height!==H){pc.width=W;pc.height=H;}
+    const g=pc.getContext("2d");g.setTransform(1,0,0,1,0,0);g.globalCompositeOperation="destination-out";
+    if(p.trail<=0||THUMB)g.clearRect(0,0,W,H);else{g.fillStyle="rgba(0,0,0,"+clamp(1-Math.pow(p.trail,.6)*.92,.04,1).toFixed(3)+")";g.fillRect(0,0,W,H);}
+    g.globalCompositeOperation="source-over";
+    const shape=p.shape==="auto"?K.sh:p.shape,hit=live?AUDIO.hit:0,base=p.size*RSCALE*K.sz*(1+hit*p.audioSize*.8),gl=p.glow,glyphs=(p.glyphs||"✦").replace(/\s+/g,"")||"✦";
+    g.lineCap="round";
+    if(shape==="glyph"){g.textAlign="center";g.textBaseline="middle";}
+    for(const o of st.ps){
+      const u=o.age/o.life;let al=1-p.fade*u*u;if(u<.08)al*=u/.08;
+      if(K.fl)al*=1-K.fl*.5+K.fl*.5*Math.sin(t*.012+o.ph*5);
+      if(al<=.01)continue;
+      const sz=Math.max(.6,base*o.sz*(shape==="square"||shape==="ring"?1:(1-.3*u)));
+      g.fillStyle=o.col;g.strokeStyle=o.col;
+      if(gl>0){g.globalAlpha=al*gl*.28;g.beginPath();g.arc(o.x,o.y,sz*2.6,0,6.283);g.fill();}
+      g.globalAlpha=al;
+      if(shape==="dot"){g.beginPath();g.arc(o.x,o.y,sz,0,6.283);g.fill();}
+      else if(shape==="ring"){g.lineWidth=Math.max(.8,sz*.22);g.beginPath();g.arc(o.x,o.y,sz,0,6.283);g.stroke();}
+      else if(shape==="line"){const m=Math.hypot(o.vx,o.vy)||1,L=sz*3+Math.min(sz*6,m*.03);g.lineWidth=Math.max(.8,sz*.5);g.beginPath();g.moveTo(o.x,o.y);g.lineTo(o.x-o.vx/m*L,o.y-o.vy/m*L);g.stroke();}
+      else if(shape==="square"){g.save();g.translate(o.x,o.y);g.rotate(o.rot);g.scale(1,.35+.65*Math.abs(Math.cos(o.rot*1.7+o.ph)));g.fillRect(-sz,-sz*.7,sz*2,sz*1.4);g.restore();}
+      else if(shape==="star"){g.save();g.translate(o.x,o.y);g.rotate(o.rot);g.beginPath();for(let i=0;i<10;i++){const a=i/10*6.283,rr=i%2?sz*.45:sz;g.lineTo(Math.cos(a)*rr,Math.sin(a)*rr);}g.closePath();g.fill();g.restore();}
+      else{g.font=(sz*2.4|0)+"px 'Space Grotesk',sans-serif";g.save();g.translate(o.x,o.y);g.rotate(o.rot*.3);g.fillText(glyphs[(o.sd|0)%glyphs.length],0,0);g.restore();}
+    }
+    g.globalAlpha=1;
+    c.clearRect(0,0,W,H);c.drawImage(pc,0,0);
+  },
+  randomize(p){p.kind=pick(["rain","snow","sparks","dust","confetti","bubbles","fireflies","embers"]);p.rate=Math.round(rand(40,260)/5)*5;p.burst=Math.round(rand(30,200)/5)*5;p.beat=pick(["beat","hit","hit","bar"]);p.trail=+rand(0,.7).toFixed(2);p.glow=+rand(.1,.8).toFixed(2);p.size=+rand(3,12).toFixed(1);p.cmode=pick(["palette","palette","dual","rainbow"]);p.c1=hslHex(rand(0,360),85,62);p.c2=hslHex(rand(0,360),85,62);p.turb=+rand(.4,2).toFixed(2);}
+},
 image:{name:"Image",accent:"#7dd3fc",schema:[
   {g:"Source"},
   {type:"upload",key:"img",label:"↑ Importer une image",accept:"image/*"}
@@ -2600,7 +2860,16 @@ video:{name:"Vidéo",accent:"#f0abfc",schema:[
   {g:"Source"},
   {type:"upload",key:"img",label:"↑ Importer une vidéo",accept:"video/*"},
   {type:"text",key:"url",label:"…ou une URL directe .mp4/.webm (les liens YouTube ne fonctionnent pas)",default:""},
-  {type:"range",key:"speed",label:"Vitesse de lecture",min:.1,max:3,step:.05,default:1}
+  {type:"range",key:"speed",label:"Vitesse de lecture",min:.1,max:3,step:.05,default:1},
+  {g:"Réactif au son"},
+  {type:"range",key:"rSpeed",label:"Vitesse sur les basses",min:0,max:3,step:.01,default:0},
+  {type:"range",key:"rFlash",label:"Flash sur les coups",min:0,max:1,step:.01,default:0},
+  {type:"range",key:"rZoom",label:"Zoom sur les coups",min:0,max:1,step:.01,default:0},
+  {type:"range",key:"rSat",label:"Saturation sur les aigus",min:0,max:1,step:.01,default:0},
+  {type:"seg",key:"rCut",label:"Montage au rythme",default:"off",options:[{v:"off",label:"Aucun"},{v:"jump",label:"Saut aléatoire"},{v:"stutter",label:"Bégaiement"},{v:"rewind",label:"Retour au début"}]},
+  {type:"seg",key:"rEvery",label:"Déclencheur",default:"beat",options:[{v:"beat",label:"Chaque temps"},{v:"bar",label:"Chaque mesure"},{v:"hit",label:"Sur les coups"}]},
+  {type:"range",key:"rLen",label:"Longueur du bégaiement",min:.05,max:1,step:.01,default:.2},
+  {type:"range",key:"rChance",label:"Probabilité",min:0,max:1,step:.05,default:1}
 ].concat(MEDIA_FRAME),
   initState(){return{img:null};},
   render(c,W,H,t,p,st){renderMedia(c,W,H,t,p,st,true);},
@@ -3401,6 +3670,46 @@ spectrum:{name:"Spectre",accent:"#3dff8a",defBlend:"screen",schema:[
     p.gap=+rand(.1,.5).toFixed(2);p.round=+rand(0,1).toFixed(2);p.thick=+rand(2,10).toFixed(1);p.rad=Math.round(rand(10,30));p.w=Math.round(rand(60,100));p.h=Math.round(rand(30,70));
     p.cmode=pick(["gradient","rainbow","level","solid"]);const h=rand(0,360);p.c1=hslHex(h,90,60);p.c2=hslHex((h+120)%360,90,60);p.glow=+rand(0,.7).toFixed(2);p.gain=+rand(.9,1.8).toFixed(2);p.curve=+rand(1,2).toFixed(2);}
 },
+warp:{name:"Déformation",accent:"#7cf2d8",usesBelow:true,schema:[
+  {g:"Déformation"},
+  {type:"seg",key:"mode",label:"Type",default:"wave",options:[{v:"wave",label:"Ondulation"},{v:"ripple",label:"Ondes"},{v:"twirl",label:"Tourbillon"},{v:"bulge",label:"Loupe"},{v:"pinch",label:"Pincement"},{v:"mirror",label:"Miroir"},{v:"slices",label:"Tranches"},{v:"pixel",label:"Pixellisation"},{v:"chroma",label:"Dispersion"},{v:"jitter",label:"Tremblement"},{v:"tile",label:"Mosaïque"}]},
+  {type:"range",key:"amount",label:"Intensité",min:0,max:1,step:.01,default:.4},
+  {type:"range",key:"freq",label:"Fréquence / finesse",min:.1,max:4,step:.01,default:1},
+  {type:"range",key:"speed",label:"Vitesse",min:0,max:3,step:.01,default:1},
+  {type:"range",key:"angle",label:"Angle",min:0,max:360,step:1,default:0},
+  {type:"range",key:"cx",label:"Centre X",min:0,max:100,step:1,default:50},
+  {type:"range",key:"cy",label:"Centre Y",min:0,max:100,step:1,default:50},
+  {g:"Réactivité"},
+  {type:"range",key:"audio",label:"Intensité sur les basses",min:0,max:2,step:.01,default:.5},
+  {type:"range",key:"hitKick",label:"Secousse sur les coups",min:0,max:2,step:.01,default:0},
+  {g:"Bords"},
+  {type:"seg",key:"edge",label:"Hors cadre",default:"mirror",options:[{v:"mirror",label:"Miroir"},{v:"clamp",label:"Étirer"},{v:"wrap",label:"Répéter"},{v:"transp",label:"Transparent"}]},
+  {type:"range",key:"mix",label:"Mélange avec l'original",min:0,max:1,step:.01,default:1}],
+  initState(){return{jt:0,jx:0,jy:0};},
+  render(c,W,H,t,p,st,below){
+    if(!below)return;
+    const live=AUDIO.playing(),amt=clamp(p.amount*(1+(live?AUDIO.bass:0)*p.audio)+(live?AUDIO.hit:0)*p.hitKick*.6,0,3);
+    // the jitter picks a new offset at most 30 times a second, so it reads as frames, not noise
+    if(p.mode==="jitter"){const fr=Math.floor(t/33);if(st.jt!==fr){st.jt=fr;const kick=1+(live?AUDIO.hit:0)*2;st.jx=(Math.random()*2-1)*kick;st.jy=(Math.random()*2-1)*kick;}}
+    const out=GLX.run("warp",WARP_FS,W,H,(gl,pr)=>{
+      GLX.bind(below,0,"w0");
+      gl.uniform1i(GLX.u(pr,"src"),0);
+      gl.uniform2f(GLX.u(pr,"res"),W,H);
+      gl.uniform2f(GLX.u(pr,"ctr"),p.cx/100,1-p.cy/100);
+      gl.uniform1f(GLX.u(pr,"time"),t*.001*p.speed);
+      gl.uniform1f(GLX.u(pr,"amt"),amt);
+      gl.uniform1f(GLX.u(pr,"freq"),p.freq);
+      gl.uniform1f(GLX.u(pr,"ang"),-p.angle*Math.PI/180);
+      gl.uniform1f(GLX.u(pr,"mode"),WARP_MODE[p.mode]||0);
+      gl.uniform1f(GLX.u(pr,"edge"),WARP_EDGE[p.edge]||0);
+      gl.uniform1f(GLX.u(pr,"mixv"),p.mix==null?1:p.mix);
+      gl.uniform1f(GLX.u(pr,"jx"),st.jx);gl.uniform1f(GLX.u(pr,"jy"),st.jy);
+    });
+    c.clearRect(0,0,W,H);
+    if(out)c.drawImage(out,0,0,W,H);else c.drawImage(below,0,0,W,H);
+  },
+  randomize(p){p.mode=pick(["wave","ripple","twirl","bulge","pinch","mirror","slices","pixel","chroma","jitter","tile"]);p.amount=+rand(.15,.8).toFixed(2);p.freq=+rand(.4,2.5).toFixed(2);p.speed=+rand(.3,2).toFixed(2);p.angle=Math.round(rand(0,360));p.audio=+rand(0,1.2).toFixed(2);}
+},
 post:{name:"Post FX",accent:"#ffd166",usesBelow:true,schema:[
   {g:"Bloom"},
   {type:"range",key:"bloom",label:"Bloom",min:0,max:2.5,step:.01,default:.75},
@@ -3438,7 +3747,7 @@ post:{name:"Post FX",accent:"#ffd166",usesBelow:true,schema:[
   randomize(p){p.bloom=+rand(.35,1.4).toFixed(2);p.radius=Math.round(rand(24,90));p.thresh=+rand(.4,.7).toFixed(2);p.ca=+rand(.2,1.2).toFixed(2);p.vig=+rand(.3,.9).toFixed(2);p.grain=+rand(.08,.4).toFixed(2);}
 }
 };
-const ORDER=["bg","field","smoke","image","video","deck","type","lyrics","shape","swarm","particles","flare","spectrum","process","mask","micro","post","camera"];
+const ORDER=["bg","field","smoke","image","video","deck","type","lyrics","shape","swarm","particles","emit","flare","spectrum","process","warp","mask","micro","post","camera"];
 
 const PRESETS=[
   {name:"Chrome Orbit",layers:[
@@ -3548,7 +3857,28 @@ const PRESETS=[
   {name:"Blinds",layers:[
     {t:"field",p:{mode:"flow",c1:"#d8ff3b",c2:"#3de1ff",speed:1.3,density:1.2}},
     {t:"type",p:{text:"OPEN",font:"archivo",size:220,tracking:-8,ink:"#ffffff",material:"metal",bevel:9,rough:.12,depth:6}},
-    {t:"mask",p:{kind:"stripes",count:9,duty:.55,angle:90,speed:.12,feather:6,paper:"#0a0a0b"}}]}
+    {t:"mask",p:{kind:"stripes",count:9,duty:.55,angle:90,speed:.12,feather:6,paper:"#0a0a0b"}}]},
+  {name:"Braises",layers:[
+    {t:"bg",p:{mode:"radial",a:"#1a0804",b:"#050305"}},
+    {t:"emit",b:"screen",p:{kind:"embers",rate:140,burst:120,beat:"hit",trail:.5,glow:.6,size:5,turb:1.3}},
+    {t:"type",p:{text:"BRAISES",size:200,material:"metal",ink:"#ffb347"}},
+    {t:"post",p:{bloom:1.1,radius:60,thresh:.5,ca:.4,vig:.7,grain:.25}}]},
+  {name:"Confettis",layers:[
+    {t:"bg",p:{mode:"mesh",a:"#120a24",b:"#2a1050",c:"#ff5ea8"}},
+    {t:"type",p:{text:"PARTY",size:260,material:"glass",ink:"#ffffff"}},
+    {t:"emit",b:"source-over",p:{kind:"confetti",rate:60,burst:220,beat:"bar",trail:0,glow:.1,size:7,cmode:"palette"}},
+    {t:"post",p:{bloom:.5,ca:.3,vig:.5,grain:.15}}]},
+  {name:"Onde de choc",layers:[
+    {t:"bg",p:{mode:"mesh",a:"#06101c",b:"#0e3a5a",c:"#3de1ff"}},
+    {t:"field",p:{mode:"rings",c1:"#3de1ff",c2:"#0e3a5a"}},
+    {t:"type",p:{text:"ONDE",size:300,material:"metal",ink:"#dff3ff"}},
+    {t:"warp",p:{mode:"ripple",amount:.55,freq:1.2,speed:1.2,audio:1,hitKick:.8}},
+    {t:"post",p:{bloom:.8,ca:.9,vig:.6,grain:.2}}]},
+  {name:"Kaléido",layers:[
+    {t:"bg",p:{mode:"noise",a:"#1a0a2a",b:"#ff5ea8",c:"#d8ff3b"}},
+    {t:"smoke",b:"screen",p:{}},
+    {t:"warp",p:{mode:"mirror",amount:.4,freq:3,speed:.6,audio:.4}},
+    {t:"post",p:{bloom:.7,ca:.5,vig:.65,grain:.2,sat:1.3}}]}
 ];
 const INTROS=[
   {name:"Impact",layers:[
@@ -3765,7 +4095,7 @@ function paintBackdrop(){
    space. Moves ride smooth noise and springs, never linear ramps, and the kick
    answers the music with a bounce instead of a jolt. Screen-space layers (image
    effects, the grade, the HUD) stay put: they belong to the lens, not the world. */
-const DEPTH={bg:.12,field:.18,smoke:.3,image:.32,video:.32,deck:.3,type:.85,lyrics:.72,shape:.8,swarm:.6,particles:.7,flare:.5,spectrum:.55,process:0,mask:0,micro:0,post:0,camera:0};
+const DEPTH={bg:.12,field:.18,smoke:.3,image:.32,video:.32,deck:.3,type:.85,lyrics:.72,shape:.8,swarm:.6,particles:.7,emit:.65,flare:.5,spectrum:.55,process:0,warp:0,mask:0,micro:0,post:0,camera:0};
 const COVER={bg:1,field:1,smoke:1,image:1,video:1,deck:1};
 const CAM_NAME={drift:"Dérive",push:"Avant",pull:"Arrière",orbit:"Orbite",hand:"Main",crane:"Grue",still:"Fixe"};
 const TR_NAME={whip:"Fouet",zoom:"Zoom traversant",spin:"Rotation",glitch:"Coupe glitch",dip:"Fondu au noir",flash:"Flash"};
@@ -4287,7 +4617,7 @@ function renderControls(){
   controlsEl.innerHTML="";const L=layers[sel];if(!L){controlsEl.innerHTML='<div class="emptynote">Aucun calque sélectionné.<br>Ajoutez-en un avec ＋ Ajouter.</div>';return;}
   const tool=TOOLS[L.type],p=L.params;
   const nm=document.createElement("div");nm.className="selname";nm.textContent=L.name;controlsEl.appendChild(nm);
-  if(L.type==="lyrics")controlsEl.appendChild(renderLyricLock(L));
+  if(L.type==="lyrics"){controlsEl.appendChild(renderLyricLock(L));controlsEl.appendChild(renderLyricEditor(L));}
   else if(SCRIPT.data&&(L.type==="deck"||L.type==="post"||L.jamBase||L.look))controlsEl.appendChild(renderDirNote(L));
   const bg=document.createElement("div");bg.className="grp";bg.innerHTML='<div class="grp-h">Calque</div>';
   const brow=document.createElement("div");brow.className="ctrl";brow.innerHTML='<div class="ctrl-top"><span class="ctrl-l">Fusion</span></div>';
@@ -5189,6 +5519,116 @@ function liveRecord(){
   setTimeout(()=>{if(recStopFn)recStopFn();},secs*1000);
 }
 
+
+/* ---- lyrics editor: plain lines, tapped in time with the song ----
+   Each tap stamps the line at the playhead; the cues build up as you go, so the
+   layer shows the lines you have already placed while you place the next. */
+const TAP={L:null,lines:[],i:0,st:[],t0:0};
+function lrcStamp(sec){const m=Math.floor(sec/60),x=sec-m*60;return "["+String(m).padStart(2,"0")+":"+(x<10?"0":"")+x.toFixed(2)+"]";}
+function cuesToLRC(cues){return cues.map(c=>lrcStamp(c.s)+c.t).join("\n")+"\n";}
+function lyricLines(txt){return String(txt||"").split("\n").map(x=>x.trim()).filter(Boolean);}
+function lyricsSetCues(L,cues){L.state.cues=cues;L.state._lay=null;rememberMedia(L);if(SCRIPT.data&&JAM.cues)JAM.cues=cues;}
+function cuesFromStamps(lines,st,dur){const out=[];for(let i=0;i<st.length;i++){const s=st[i],nx=st[i+1];let e=nx!=null?nx:s+6;if(dur>0)e=Math.min(e,dur);out.push({s:s,e:Math.max(s+.3,Math.min(e,s+10)),t:lines[i],wt:null});}return out;}
+function renderLyricEditor(L){
+  const d=document.createElement("div");d.className="lyed";
+  const cues=L.state.cues||[];
+  d.innerHTML='<div class="grp-h">Éditeur de paroles</div>';
+  const ta=document.createElement("textarea");ta.placeholder="Une ligne par ligne chantée…";
+  ta.value=L.state._draft!=null?L.state._draft:cues.map(c=>c.t).join("\n");
+  ta.oninput=()=>{L.state._draft=ta.value;};
+  d.appendChild(ta);
+  const row=document.createElement("div");row.className="lyrow";
+  const mk=(txt,title,fn,go)=>{const b=document.createElement("button");b.type="button";b.textContent=txt;b.title=title;if(go)b.className="go";b.onclick=fn;row.appendChild(b);return b;};
+  mk(TAP.L===L?"■ Arrêter la synchro":"⏺ Synchro au clavier","la musique démarre à la tête de lecture : Entrée (ou ↓) cale la ligne en cours, Retour reprend la précédente, Échap termine",()=>{if(TAP.L===L)tapEnd();else tapStart(L,lyricLines(ta.value));},true);
+  mk("≡ Répartir","étaler les lignes à intervalles réguliers sur toute la durée du morceau",()=>{
+    const lines=lyricLines(ta.value),dur=AUDIO.el&&isFinite(AUDIO.el.duration)?AUDIO.el.duration:0;
+    if(!lines.length){toast("écrivez d'abord les paroles");return;}if(!dur){toast("chargez d'abord un morceau");return;}
+    const st=lines.map((x,i)=>+(dur*(i+.5)/(lines.length+.5)).toFixed(2));
+    lyricsSetCues(L,cuesFromStamps(lines,st,dur));renderControls();toast(lines.length+" lignes réparties sur "+Math.round(dur)+" s");});
+  mk("⤓ .lrc","enregistrer les paroles synchronisées dans un fichier .lrc",()=>{
+    const c=L.state.cues||[];if(!c.length){toast("aucune ligne synchronisée");return;}
+    saveBlob(new Blob([cuesToLRC(c)],{type:"text/plain"}),(AUDIO.name||"paroles").replace(/\.[^.]+$/,"")+".lrc");});
+  d.appendChild(row);
+  const p=document.createElement("p");
+  p.innerHTML=cues.length?("<b>"+cues.length+" lignes synchronisées</b> · de "+fmtT(cues[0].s)+" à "+fmtT(cues[cues.length-1].s)+". Modifiez le texte puis relancez la synchro, ou répartissez.")
+    :"Collez le texte, une ligne par ligne chantée, puis <b>⏺ Synchro au clavier</b> : appuyez sur <b>Entrée</b> à chaque ligne pendant la lecture.";
+  d.appendChild(p);
+  return d;
+}
+const tapHud=document.getElementById("tapHud");
+function tapStart(L,lines){
+  if(!lines.length){toast("écrivez d'abord les paroles");return;}
+  if(!AUDIO.el){toast("chargez d'abord un morceau (♪ Musique)");return;}
+  TAP.L=L;TAP.lines=lines;TAP.i=0;TAP.st=[];
+  tapHud.hidden=false;tapShow();setPlaying(true);renderControls();
+  toast("Entrée à chaque ligne chantée");
+}
+function tapShow(){
+  const n=TAP.lines.length,i=TAP.i;
+  document.getElementById("tapC").textContent="Synchro · ligne "+Math.min(i+1,n)+" / "+n+" · "+fmtT(AUDIO.now());
+  document.getElementById("tapL").textContent=i<n?TAP.lines[i]:"✓ toutes les lignes sont calées";
+  document.getElementById("tapN").textContent=i+1<n?"suivante : "+TAP.lines[i+1]:"";
+}
+function tapStamp(){
+  if(!TAP.L)return;const L=TAP.L;
+  if(TAP.i>=TAP.lines.length){tapEnd();return;}
+  const t=+Math.max(0,AUDIO.now()).toFixed(2);
+  if(TAP.st.length&&t<=TAP.st[TAP.st.length-1])TAP.st.push(TAP.st[TAP.st.length-1]+.3);else TAP.st.push(t);
+  TAP.i++;
+  const dur=AUDIO.el&&isFinite(AUDIO.el.duration)?AUDIO.el.duration:0;
+  lyricsSetCues(L,cuesFromStamps(TAP.lines,TAP.st,dur));
+  if(TAP.i>=TAP.lines.length){tapEnd();return;}
+  tapShow();
+}
+function tapBack(){
+  if(!TAP.L||!TAP.st.length)return;
+  TAP.st.pop();TAP.i--;
+  const back=TAP.st.length?TAP.st[TAP.st.length-1]:0;
+  seekTo(Math.max(0,back-.5));
+  const dur=AUDIO.el&&isFinite(AUDIO.el.duration)?AUDIO.el.duration:0;
+  lyricsSetCues(TAP.L,cuesFromStamps(TAP.lines,TAP.st,dur));tapShow();
+}
+function tapEnd(){
+  if(!TAP.L)return;const n=TAP.st.length;
+  TAP.L=null;tapHud.hidden=true;renderControls();
+  toast(n?(n+" ligne"+(n>1?"s":"")+" synchronisée"+(n>1?"s":"")):"synchro annulée");
+}
+document.getElementById("tapGo").onclick=tapStamp;
+document.getElementById("tapBack").onclick=tapBack;
+document.getElementById("tapEnd").onclick=tapEnd;
+setInterval(()=>{if(TAP.L&&!tapHud.hidden)tapShow();},250);
+
+/* ---- presentation: full screen, no chrome, keys to drive ---- */
+const PRES={on:false,idle:null};
+const presHud=document.getElementById("presHud");
+function presWake(){if(!PRES.on)return;document.body.classList.remove("idle");clearTimeout(PRES.idle);PRES.idle=setTimeout(()=>{if(PRES.on)document.body.classList.add("idle");},2600);}
+function presentOn(){
+  if(PRES.on)return;PRES.on=true;document.body.classList.add("present");
+  const el=document.documentElement;try{if(el.requestFullscreen){const r=el.requestFullscreen();if(r&&r.catch)r.catch(()=>{});}}catch(e){}
+  presWake();presTick();setTimeout(fit,50);
+}
+function presentOff(){
+  if(!PRES.on)return;PRES.on=false;document.body.classList.remove("present","idle");clearTimeout(PRES.idle);
+  try{if(document.fullscreenElement&&document.exitFullscreen){const r=document.exitFullscreen();if(r&&r.catch)r.catch(()=>{});}}catch(e){}
+  setTimeout(fit,50);
+}
+function presTick(){
+  if(!PRES.on)return;
+  document.getElementById("presName").textContent=curPresetName||"VideoGen";
+  const el=AUDIO.el,dur=el&&isFinite(el.duration)?el.duration:0;
+  document.getElementById("presTime").textContent=el?((AUDIO.playing()?"▶ ":"‖ ")+fmtT(AUDIO.now())+(dur?" / "+fmtT(dur):"")):"";
+  setTimeout(presTick,250);
+}
+// the gallery in order, your presets included: the arrows walk it
+function presStep(dir){
+  const list=ALLPRESETS;if(!list.length)return;
+  let i=list.findIndex(p=>p.name===curPresetName);
+  i=i<0?(dir>0?0:list.length-1):(i+dir+list.length)%list.length;
+  applyPreset(list[i]);
+}
+document.addEventListener("fullscreenchange",()=>{if(!document.fullscreenElement&&PRES.on)presentOff();});
+document.getElementById("presBtn").onclick=()=>{PRES.on?presentOff():presentOn();};
+stageEl.addEventListener("pointermove",presWake);
 document.getElementById("expand").onclick=()=>{document.body.classList.toggle("preview");document.getElementById("expand").textContent=document.body.classList.contains("preview")?"⤡ Quitter":"⤢ Aperçu";};
 
 /* ---------------- Jam Session ---------------- */
@@ -5208,6 +5648,8 @@ const JAM_LOOKS=[
   {id:"smoke",label:"Fumée",extra:i=>({t:"smoke",b:"screen",p:{mode:"energy",speed:.75,scale:1.3,detail:2},mfx:{audio:.6*i}})},
   {id:"flares",label:"Halos",extra:i=>({t:"flare",b:"screen",p:{pos:"orbit",intensity:.45,size:1.1,streak:1.6,ghosts:4},mfx:{audio:1.25*i}})},
   {id:"spectrum",label:"Spectre",extra:i=>({t:"spectrum",b:"screen",p:{shape:"bars",bands:48,anchor:"bottom",cmode:"gradient",c1:"#3dff8a",c2:"#3de1ff",glow:.4,w:90,h:35,gain:+(1+.3*i).toFixed(2)},mfx:{audio:.15*i}})},
+  {id:"emit",label:"Émetteur",extra:i=>({t:"emit",b:"screen",p:{kind:pick(["sparks","embers","dust","fireflies"]),rate:Math.round(50+90*i),burst:Math.round(50+90*i),beat:"hit",trail:+(.25+.3*i).toFixed(2),glow:.5,audio:+(.5+.6*i).toFixed(2)}})},
+  {id:"warp",label:"Déformation",heavy:true,fx:()=>({t:"warp",p:{mode:pick(["wave","ripple","twirl","chroma","slices"]),amount:.35,audio:.8,hitKick:.4}})},
   {id:"mask",label:"Fenêtre",fx:()=>({t:"mask",p:{kind:"shape",shape:"ellipse",w:72,h:78,feather:110,amount:.9}})}
 ];
 const jamEl=document.getElementById("jam"),jamGo=document.getElementById("jamGo");
@@ -5250,7 +5692,7 @@ function jamRefresh(){
 // w: how much a look fills the frame; c: what it costs to render (profiled)
 const LOOK_W={glitch:{w:2,c:.6},neon:{w:2,c:3},kaleido:{w:2.2,c:1.3},sort:{w:2,c:1},liquid:{w:2,c:.5},micro:{w:1.8,c:1},
   vhs:{w:1.1,c:.9},retro:{w:1.2,c:1.1},rgb:{w:1,c:.5},thermal:{w:2,c:1.6},
-  particles:{w:1,c:1.2},smoke:{w:1.5,c:2.2},flares:{w:.8,c:.6},spectrum:{w:1.1,c:.3},mask:{w:1,c:.3}};
+  particles:{w:1,c:1.2},smoke:{w:1.5,c:2.2},flares:{w:.8,c:.6},spectrum:{w:1.1,c:.3},mask:{w:1,c:.3},emit:{w:1.1,c:.9},warp:{w:1.6,c:.7}};
 // pairs that fight: smoke's fog erases line art, two textures on top turn to mud
 const LOOK_CLASH={"neon|smoke":0,"thermal|smoke":.25,"liquid|smoke":.3,"micro|particles":.4,"vhs|smoke":.6,"sort|particles":.6,"kaleido|smoke":.5};
 function lookClash(a,b){const x=LOOK_CLASH[a+"|"+b],y=LOOK_CLASH[b+"|"+a];return x!=null?x:(y!=null?y:1);}
@@ -5833,13 +6275,13 @@ document.getElementById("jamScript").onclick=saveJamScript;
    grid is a magnet, not a rule. Your edits sit over the plan and survive every
    re-roll; editing never regenerates the parts of the song you did not touch. */
 const LOOK_COL={glitch:"#ff2d6b",neon:"#3dffd0",kaleido:"#ffb03d",sort:"#b36bff",liquid:"#3db4ff",micro:"#e8f4fa",
-  thermal:"#ff7a3d",vhs:"#fff05c",retro:"#9dff5c",rgb:"#ff5ea8",particles:"#ff9ad5",smoke:"#9aa0ff",flares:"#fff3b0",spectrum:"#3dff8a",mask:"#e0c3ff"};
+  thermal:"#ff7a3d",vhs:"#fff05c",retro:"#9dff5c",rgb:"#ff5ea8",particles:"#ff9ad5",smoke:"#9aa0ff",flares:"#fff3b0",spectrum:"#3dff8a",mask:"#e0c3ff",emit:"#ffb347",warp:"#7cf2d8"};
 const TL_COL={intro:"#6b7688",verse:"#3de1ff",build:"#ffc53d",drop:"#ff3d7a",breakdown:"#a58bff",outro:"#6b7688",song:"#8a8aff"};
 const dockEl=document.getElementById("dock"),dkTracks=document.getElementById("dkTracks");
 let DRAG=null,_dkNow=-1,_dkHeads=[],_dkDrew=0;
 
 const LOOK_SHORT={glitch:"GLT",neon:"NEO",kaleido:"KAL",sort:"SRT",liquid:"LIQ",micro:"MIC",thermal:"THR",vhs:"VHS",retro:"RET",rgb:"RGB",
-  particles:"PTC",smoke:"SMK",flares:"FLR",spectrum:"SPC",mask:"MSK"};
+  particles:"PTC",smoke:"SMK",flares:"FLR",spectrum:"SPC",mask:"MSK",emit:"EMT",warp:"WRP"};
 // the label that fits: the full name, a three-letter code, or just the colour
 function lookFit(id,px){const full=lookLabel(id);if(px>=full.length*6.4+22)return full;
   if(px>=34)return LOOK_SHORT[id]||full.slice(0,3).toUpperCase();return "";}
@@ -6771,8 +7213,22 @@ window.addEventListener("keydown",e=>{
   const typing=/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName);
   if((e.ctrlKey||e.metaKey)&&(e.key==="z"||e.key==="Z")){e.preventDefault();(e.shiftKey?redo:undo)();return;}
   if((e.ctrlKey||e.metaKey)&&(e.key==="y"||e.key==="Y")){e.preventDefault();redo();return;}
+  // tapping lyrics in time: Enter stamps, Backspace steps back, Esc ends
+  if(TAP.L&&!typing){
+    if(e.key==="Enter"||e.key==="ArrowDown"){e.preventDefault();tapStamp();return;}
+    if(e.key==="Backspace"){e.preventDefault();tapBack();return;}
+    if(e.key==="Escape"){e.preventDefault();tapEnd();return;}
+  }
   if(typing)return;
   if(e.key===" "||e.code==="Space"){e.preventDefault();togglePlay();return;}
+  if(PRES.on){presWake();
+    if(e.key==="Escape"||e.key==="p"||e.key==="P"){e.preventDefault();presentOff();}
+    else if(e.key==="ArrowLeft"||e.key==="ArrowRight"){e.preventDefault();if(AUDIO.el)seekTo(clamp(AUDIO.now()+(e.key==="ArrowRight"?5:-5),0,Math.max(0,(AUDIO.el.duration||0)-.1)));}
+    else if(e.key==="ArrowUp"||e.key==="ArrowDown"){e.preventDefault();presStep(e.key==="ArrowDown"?1:-1);}
+    else if(e.key==="g"||e.key==="G")document.getElementById("random").click();
+    else if(e.key==="v"||e.key==="V")document.getElementById("vary").click();
+    else if(e.key==="r"||e.key==="R")document.getElementById("shuffle").click();
+    return;}
   // the selected timeline block: Del removes, B cuts at the playhead, arrows nudge
   if(TL.sel&&SCRIPT.data&&dockEl.classList.contains("on")){
     if(e.key==="Delete"||e.key==="Backspace"){e.preventDefault();const o=tlSelectedObj();if(o)tlRemove(o);return;}
@@ -6793,6 +7249,7 @@ window.addEventListener("keydown",e=>{
   else if(e.key==="f"||e.key==="F")document.getElementById("expand").click();
   else if(e.key==="h"||e.key==="H")openGuide();
   else if(e.key==="a"||e.key==="A")openArrangement();
+  else if(e.key==="p"||e.key==="P")presentOn();
   else if(e.key==="Escape"&&document.body.classList.contains("preview"))document.getElementById("expand").click();
 });
 
