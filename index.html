@@ -3660,7 +3660,7 @@ const CAM={on:false,x:0,y:0,z:0,roll:0,k:{x:0,v:0},last:0,T:null,
     this.T=null;this.on=!!L;
     if(!L){this.x=this.y=this.z=this.roll=0;return;}
     const p=L.params,tt=tm*.001,dt=this.last?clamp(tt-this.last,0,.1):1/60;this.last=tt;
-    const live=AUDIO.playing(),now=live?AUDIO.now():0,sec=SCRIPT.data&&live?SCRIPT.sectionAt(now):null;
+    const live=AUDIO.playing(),has=live||!!AUDIO.el,now=has?AUDIO.now():0,sec=SCRIPT.data&&has?SCRIPT.sectionAt(now):null;
     let move=p.move,A=p.amount==null?.7:p.amount;
     if(move==="auto"){const cm=sec&&sec.cam;move=cm?cm.move:"drift";A*=cm?cm.amt:1;}
     const u=sec?clamp((now-sec.at)/Math.max(.01,sec.len),0,1):.5,eu=u*u*(3-2*u),s=tt*(p.speed||1);
@@ -3679,7 +3679,7 @@ const CAM={on:false,x:0,y:0,z:0,roll:0,k:{x:0,v:0},last:0,T:null,
     const kz=spring(this.k,live?clamp(AUDIO.hit,0,1)*(p.kick==null?.7:p.kick):0,dt,3.4,.34);
     z+=kz*.045;y-=kz*.004;
     this.x=x;this.y=y;this.z=z;this.roll=r;
-    if(live&&SCRIPT.data&&p.trans!=="off"){const T=transAt(p,now);
+    if(has&&SCRIPT.data&&p.trans!=="off"){const T=transAt(p,now);
       if(T){this.T=T;this.x+=T.x;this.y+=T.y;this.z+=T.z;this.roll+=T.r;}}
   }
 };
@@ -5283,7 +5283,9 @@ const SCRIPT={data:null,cur:-1,ev:-1,on:true,
   tick(){
     if(!this.data)return;
     if(typeof timelineTick==="function")timelineTick();
-    if(!AUDIO.playing())return;
+    // paused counts too: the stage shows the cut at the playhead, so moving the
+    // head while paused previews exactly what a render would draw there
+    if(!AUDIO.playing()&&!AUDIO.el)return;
     const now=AUDIO.now(),sec=this.on?this.sectionAt(now):null;
     if(sec){
       if(sec.i!==this.cur){this.cur=sec.i;this.ev=-1;}
