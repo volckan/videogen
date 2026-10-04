@@ -196,13 +196,13 @@ body.preview .dock{display:none!important}
 .bk:active{cursor:grabbing}
 .bk.now{opacity:1;box-shadow:0 0 0 1.5px #fff,0 0 14px var(--glow,rgba(255,255,255,.4))}
 .bk .nm{overflow:hidden;text-overflow:ellipsis;min-width:0}
-.bk .x,.bk .u{flex:0 0 auto;font-family:var(--mono);font-size:9px;line-height:1;color:#08080a;background:rgba(255,255,255,.85);border-radius:2px;padding:1px 3px;opacity:0;transition:opacity .12s;cursor:pointer;border:0}
+.bk .x,.bk .u,.bk .sc{flex:0 0 auto;font-family:var(--mono);font-size:9px;line-height:1;color:#08080a;background:rgba(255,255,255,.85);border-radius:2px;padding:1px 3px;opacity:0;transition:opacity .12s;cursor:pointer;border:0}
 .bk .x{margin-left:auto}
-.bk:hover .x,.bk:hover .u{opacity:1}
+.bk:hover .x,.bk:hover .u,.bk:hover .sc{opacity:1}
 .bar{position:absolute;left:0;right:0;top:50%;height:3px;margin-top:-1.5px;border-radius:2px;background:rgba(255,255,255,.14)}
 .lr.deck .bar{background:linear-gradient(90deg,rgba(255,94,168,.35),rgba(255,94,168,.18))}
 .lr.flat .bar{opacity:.4}
-.bar.free{cursor:crosshair;transition:filter .15s,opacity .15s}
+.bar.free,.lr.look .dk-trk.free{cursor:crosshair;transition:filter .15s,opacity .15s}
 .lr.flat .bar.free:hover{opacity:.9;filter:brightness(1.4)}
 .lr .seg{position:absolute;top:4px;bottom:4px;background:#ffd166;border-radius:2px;box-shadow:inset -1px 0 0 #0b0b0d}
 .lr .cue{position:absolute;top:3px;bottom:3px;background:rgba(255,209,102,.4);border-radius:2px}
@@ -965,6 +965,7 @@ body.preview .panel{display:none}
     <li><b>Clips</b> : la piste VJ Deck montre le montage du réalisateur — chaque clip, quand il commence et quand il finit — et le deck joue exactement cela. Déplacez, rognez, coupez ou retirez-en un comme n'importe quel bloc ; en retirer un laisse une plage vide (hachurée — ↺ la rend, ou déposez-y un autre clip). Une vignette de clip déposée sur la piste joue depuis sa première image, en coupe franche, et rogne ce qu'elle recouvre, comme dans tout éditeur.</li>
     <li><b>↶ ↷</b> (ou <kbd>Ctrl Z</kbd> / <kbd>Ctrl Maj Z</kbd>) annulent et rétablissent ; <b>Effacer les retouches</b> rend tout le montage au réalisateur ; <b>↻ Nouveau montage</b> en crée un autre en gardant chaque retouche ; <b>Réalisateur · activé/désactivé</b> vous donne les commandes (vos blocs jouent toujours) ; <b>⤓ Script</b> télécharge la session avec vos retouches.</li>
     <li><b>Un calque ajouté pendant la jam</b> apparaît comme une ligne continue : il joue tout le morceau. Pour lui donner un début et une fin, tracez directement sur sa piste (pressez au début voulu, relâchez à la fin), ou glissez-le depuis la liste des calques : il devient un bloc que vous déplacez et rognez comme les autres.</li>
+    <li><b>Ajouter ou couper des blocs</b> : sur toute piste de look, tracer sur une plage vide crée un nouveau bloc, même quand la piste n'en a plus aucun. Au survol d'un bloc, <b>✂</b> le coupe en deux (à la tête de lecture si elle est dedans, sinon au milieu) ; <kbd>B</kbd> coupe le bloc sélectionné à la tête de lecture, qui reste sélectionné quand vous cliquez sur les pistes pour déplacer la tête (<kbd>Échap</kbd> désélectionne).</li>
     <li><b>Naviguer</b> : <b>▶</b> dans l'en-tête (ou <kbd>Espace</kbd>) lance et arrête la lecture ; cliquez sur les pistes pour sauter sans changer l'état de lecture ; pressez et glissez le long de la règle pour parcourir le morceau — la lecture se met en pause pendant que vous déplacez la tête ; <b>|◆</b> et <b>◆|</b> (touches <kbd>,</kbd> et <kbd>.</kbd>) sautent à l'image-clé précédente ou suivante ; <kbd>Ctrl</kbd> + molette pour zoomer autour du pointeur. Glissez le bord supérieur de la timeline pour l'agrandir : les pistes grandissent avec elle ; <b>▾</b> la replie.</li>
   </ul>
   <div class="gd-tip"><b>Les calques en gris</b> dans la liste sont des looks qui attendent leur phrase : l'étiquette dit quand le réalisateur les fait entrer (<i>à 1:20</i>).</div>
@@ -5871,6 +5872,8 @@ dkRows.addEventListener("mousemove",e=>{const b=e.target.closest(".bk");if(!b||!
   if(!b._btns){b._btns=true;const o=b._o;
     if(o.item&&o.item.from){const u=dkEl("button","u",b);u.type="button";u.textContent="↺";u.title="annuler votre retouche ici : le bloc du réalisateur revient";
       u.onclick=ev=>{ev.stopPropagation();tlRestore(o);};}
+    const sc=dkEl("button","sc",b);sc.type="button";sc.textContent="✂";sc.title="couper ce bloc en deux : à la tête de lecture si elle est dedans, sinon au milieu";
+    sc.onclick=ev=>{ev.stopPropagation();const now=AUDIO.el?AUDIO.now():0;tlSplitAt(o,now>o.t0+.05&&now<o.t1-.05?now:(o.t0+o.t1)/2);};
     const x=dkEl("button","x",b);x.type="button";x.textContent="✕";x.title=o.item?"retirer ce bloc":(o.kind==="clip"?"le retirer (la plage reste vide)":"le retirer ici (cette plage reste nette)");
     x.onclick=ev=>{ev.stopPropagation();tlRemove(o);};}});
 // Pressing a block: a click selects it; a drag moves it, or trims it from an edge.
@@ -5974,14 +5977,18 @@ function tlRestore(o){
   tlNormalize();TL.sel=null;tlChanged("rendu au réalisateur");
 }
 // B cuts the selected block at the playhead into two you can move on their own
-function tlSplit(){
-  let it=typeof TL.sel==="string"?TL.items.find(x=>x.id===TL.sel):null;const t=AUDIO.el?AUDIO.now():0,o=tlSelectedObj();
-  if(!o){toast("sélectionnez un bloc, puis B le coupe à la tête de lecture");return;}
+function tlSplitAt(o,t){
   if(t<=o.t0+.05||t>=o.t1-.05){toast("placez la tête de lecture dans le bloc pour le couper");return;}
   tlSnapshot();
+  let it=o.item?TL.items.find(x=>x.id===o.item.id):null;
   if(!it)it=tlAdopt(o);
   const b2=Object.assign({},it,{id:tlId(),t0:t});if(it.kind==="clip")b2.cin=(it.cin||0)+(t-it.t0);
   delete b2.from;it.t1=t;TL.items.push(b2);tlNormalize();TL.sel=b2.id;tlChanged("coupé à "+fmtTs(t));
+}
+function tlSplit(){
+  const o=tlSelectedObj();
+  if(!o){toast("sélectionnez un bloc, puis B le coupe à la tête de lecture");return;}
+  tlSplitAt(o,AUDIO.el?AUDIO.now():0);
 }
 // arrow keys nudge the selected block by the grid (a beat, or a bar with Shift)
 function tlNudge(dir,big){
@@ -5998,7 +6005,6 @@ function tlSelectedObj(){
 dkScroll.addEventListener("click",e=>{
   if(!SCRIPT.data||!AUDIO.el||performance.now()-_dkDrew<400||e.target.closest(".bk,.x,.u,.rr,.dk-lab,button"))return;
   const r=dkTracks.getBoundingClientRect();if(e.clientX<r.left)return;
-  if(TL.sel){TL.sel=null;dkContent.querySelectorAll(".bk.sel").forEach(x=>x.classList.remove("sel"));}
   seekTo(tlTimeAt(e.clientX));
 });
 dkScroll.addEventListener("mousemove",e=>{
@@ -6157,6 +6163,10 @@ function dkLayerRow(rowsEl,L,i,TW){
   lab.onclick=e=>{e.stopPropagation();sel=i;renderLayerList();renderControls();};
   const trk=dkEl("div","dk-trk",row);
   if(L.look){tlLookRow(trk,L,TW);
+    // the empty stretch of the track draws a new block, like an always-on layer's bar
+    trk.classList.add("free");trk.title="tracez ici du début à la fin voulus pour ajouter un bloc";
+    // over bare track or over a hatched stretch you took off; the blocks themselves move and trim
+    trk.addEventListener("pointerdown",e=>{const g=e.target.closest(".bk");if(e.target===trk||(g&&g.classList.contains("off")&&!e.target.closest("button")))tlDraw(e,L,row);});
   }else if(L.type==="deck"){tlClipRow(trk,TW);
   }else if(L.type==="camera"){
     // each section's move, and a marker where a transition hides the cut
