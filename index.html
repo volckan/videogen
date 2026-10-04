@@ -199,6 +199,8 @@ body.preview .dock{display:none!important}
 .bar{position:absolute;left:0;right:0;top:50%;height:3px;margin-top:-1.5px;border-radius:2px;background:rgba(255,255,255,.14)}
 .lr.deck .bar{background:linear-gradient(90deg,rgba(255,94,168,.35),rgba(255,94,168,.18))}
 .lr.flat .bar{opacity:.4}
+.bar.free{cursor:crosshair;transition:filter .15s,opacity .15s}
+.lr.flat .bar.free:hover{opacity:.9;filter:brightness(1.4)}
 .lr .seg{position:absolute;top:4px;bottom:4px;background:#ffd166;border-radius:2px;box-shadow:inset -1px 0 0 #0b0b0d}
 .lr .cue{position:absolute;top:3px;bottom:3px;background:rgba(255,209,102,.4);border-radius:2px}
 /* the overlay rides over the tracks only: grid, playhead, hover, drop target */
@@ -936,6 +938,7 @@ body.preview .panel{display:none}
     <li><b>Les blocs du réalisateur</b> sont modifiables : déplacez, rognez ou retirez-en un et il devient le vôtre, tandis que la plage qu'il a laissée reste nette (hachurée — <b>↺</b> la lui rend).</li>
     <li><b>Clips</b> : la piste VJ Deck montre le montage du réalisateur — chaque clip, quand il commence et quand il finit — et le deck joue exactement cela. Déplacez, rognez, coupez ou retirez-en un comme n'importe quel bloc ; en retirer un laisse une plage vide (hachurée — ↺ la rend, ou déposez-y un autre clip). Une vignette de clip déposée sur la piste joue depuis sa première image, en coupe franche, et rogne ce qu'elle recouvre, comme dans tout éditeur.</li>
     <li><b>↶ ↷</b> (ou <kbd>Ctrl Z</kbd> / <kbd>Ctrl Maj Z</kbd>) annulent et rétablissent ; <b>Effacer les retouches</b> rend tout le montage au réalisateur ; <b>↻ Nouveau montage</b> en crée un autre en gardant chaque retouche ; <b>Réalisateur · activé/désactivé</b> vous donne les commandes (vos blocs jouent toujours) ; <b>⤓ Script</b> télécharge la session avec vos retouches.</li>
+    <li><b>Un calque ajouté pendant la jam</b> apparaît comme une ligne continue : il joue tout le morceau. Pour lui donner un début et une fin, tracez directement sur sa piste (pressez au début voulu, relâchez à la fin), ou glissez-le depuis la liste des calques : il devient un bloc que vous déplacez et rognez comme les autres.</li>
     <li><b>Naviguer</b> : cliquez sur les pistes pour sauter, pressez et glissez le long de la règle pour parcourir le morceau, <kbd>Ctrl</kbd> + molette pour zoomer autour du pointeur. Glissez le bord supérieur de la timeline pour l'agrandir : les pistes grandissent avec elle ; <b>▾</b> la replie.</li>
   </ul>
   <div class="gd-tip"><b>Les calques en gris</b> dans la liste sont des looks qui attendent leur phrase : l'étiquette dit quand le réalisateur les fait entrer (<i>à 1:20</i>).</div>
@@ -3660,10 +3663,10 @@ const layerList=document.getElementById("layerList");
 function nextLookTime(id){
   const sc=SCRIPT.data;if(!sc)return null;
   const now=AUDIO.el?AUDIO.now():0;let after=null,first=null;
-  sc.sections.forEach(sec=>sec.events.forEach(e=>{
-    if(e.fx!==id&&e.extras.indexOf(id)<0)return;
-    if(first===null||e.at<first)first=e.at;
-    if(e.at>now+.05&&(after===null||e.at<after))after=e.at;}));
+  const seen=at=>{if(first===null||at<first)first=at;if(at>now+.05&&(after===null||at<after))after=at;};
+  sc.sections.forEach(sec=>sec.events.forEach(e=>{if(e.fx===id||e.extras.indexOf(id)>=0)seen(e.at);}));
+  // your own blocks count too: a layer you placed is not "unused"
+  TL.items.forEach(it=>{if(it.kind==="look"&&it.look===id&&it.mode!=="off")seen(it.t0);});
   return after!==null?after:first;
 }
 function lookTag(L){
@@ -5231,7 +5234,7 @@ const LOOK_COL={glitch:"#ff2d6b",neon:"#3dffd0",kaleido:"#ffb03d",sort:"#b36bff"
   thermal:"#ff7a3d",vhs:"#fff05c",retro:"#9dff5c",rgb:"#ff5ea8",particles:"#ff9ad5",smoke:"#9aa0ff",flares:"#fff3b0"};
 const TL_COL={intro:"#6b7688",verse:"#3de1ff",build:"#ffc53d",drop:"#ff3d7a",breakdown:"#a58bff",outro:"#6b7688"};
 const dockEl=document.getElementById("dock"),dkTracks=document.getElementById("dkTracks");
-let DRAG=null,_dkNow=-1,_dkHeads=[];
+let DRAG=null,_dkNow=-1,_dkHeads=[],_dkDrew=0;
 
 const LOOK_SHORT={glitch:"GLT",neon:"NEO",kaleido:"KAL",sort:"SRT",liquid:"LIQ",micro:"MIC",thermal:"THR",vhs:"VHS",retro:"RET",rgb:"RGB",
   particles:"PTC",smoke:"SMK",flares:"FLR"};
@@ -5608,6 +5611,28 @@ function tlPress(e,o,b){
   };
   window.addEventListener("pointermove",mv);window.addEventListener("pointerup",up);window.addEventListener("pointercancel",up);
 }
+// Drawing on an always-on layer's track: press where the block should start and
+// drag to where it should end. The layer then follows the timeline and plays
+// only inside its blocks, like a look dropped from the palette.
+function tlDraw(e,L,row){
+  if(e.button!==0||!SCRIPT.data)return;
+  e.preventDefault();e.stopPropagation();
+  const D=SCRIPT.data.track.duration,top=row?row.offsetTop:52,h=row?row.offsetHeight:18,box=document.getElementById("dkDrop");
+  const a=tlSnapT(tlTimeAt(e.clientX),e.shiftKey).t;let bT=a,moved=false;
+  const mv=ev=>{if(!moved&&Math.abs(ev.clientX-e.clientX)<3)return;moved=true;
+    bT=tlSnapT(tlTimeAt(ev.clientX),ev.shiftKey).t;
+    const t0=Math.min(a,bT),t1=Math.max(a,bT);
+    box.style.display="block";box.style.left=dkPct(t0)+"%";box.style.width=(dkPct(t1)-dkPct(t0))+"%";box.style.top=top+"px";box.style.height=h+"px";
+    tlShowGuide(bT,layerTitle(L)+"  "+fmtTs(t0)+" – "+fmtTs(t1),top);};
+  const up=()=>{window.removeEventListener("pointermove",mv);window.removeEventListener("pointerup",up);window.removeEventListener("pointercancel",up);
+    tlHideGuide();if(!moved)return;
+    _dkDrew=performance.now();
+    const t0=clamp(Math.min(a,bT),0,D),t1=clamp(Math.max(a,bT),0,D);if(t1-t0<.1)return;
+    const id=ensureLayerLook(L);if(!id)return;
+    tlSnapshot();const it={id:tlId(),kind:"look",look:id,mode:"on",t0:t0,t1:t1};TL.items.push(it);tlNormalize(it.id);TL.sel=it.id;
+    tlChanged(layerTitle(L)+" joue de "+fmtTs(t0)+" à "+fmtTs(t1)+" — tirez les bords pour ajuster, glissez pour déplacer");};
+  window.addEventListener("pointermove",mv);window.addEventListener("pointerup",up);window.addEventListener("pointercancel",up);
+}
 function tlName(o){const it=o.item||{},k=o.kind||it.kind;return k==="clip"?"clip "+((o.clip!=null?o.clip:it.clip)+1):lookLabel(o.look||it.look);}
 // Taking a block off: yours is deleted; the director's goes quiet there (a clip
 // leaves an empty stretch you can fill or give back)
@@ -5661,7 +5686,7 @@ function tlSelectedObj(){
 }
 // a click on empty track jumps the song there; a click on a block only selects it
 dkScroll.addEventListener("click",e=>{
-  if(!SCRIPT.data||!AUDIO.el||e.target.closest(".bk,.x,.u,.rr,.dk-lab,button"))return;
+  if(!SCRIPT.data||!AUDIO.el||performance.now()-_dkDrew<400||e.target.closest(".bk,.x,.u,.rr,.dk-lab,button"))return;
   const r=dkTracks.getBoundingClientRect();if(e.clientX<r.left)return;
   if(TL.sel){TL.sel=null;dkContent.querySelectorAll(".bk.sel").forEach(x=>x.classList.remove("sel"));}
   try{AUDIO.el.currentTime=tlTimeAt(e.clientX);}catch(err){}
@@ -5841,7 +5866,11 @@ function dkLayerRow(rowsEl,L,i,TW){
       s.style.opacity=(.18+.6*sec.energy).toFixed(2);s.title="étalonnage · "+secLabel(sec)+" · "+Math.round(sec.energy*100)+"%";});
   }else{
     const bar=dkEl("div","bar",trk);bar.style.background=(TOOLS[L.type]?TOOLS[L.type].accent:"#888");
-    bar.title=L.jamBase?"le fond joue sur tout le morceau":(dockSchedulable(L)?"toujours actif — glissez le calque sur une phrase pour le programmer":"joue sur tout le morceau");
+    if(L.jamBase)bar.title="le fond joue sur tout le morceau";
+    else if(dockSchedulable(L)){bar.classList.add("free");
+      bar.title="toujours actif — tracez ici du début à la fin voulus pour en faire un bloc (ou déposez le calque depuis la liste)";
+      bar.addEventListener("pointerdown",e=>tlDraw(e,L,row));}
+    else bar.title="joue sur tout le morceau";
   }
 }
 function dockRender(){
